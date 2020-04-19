@@ -1,0 +1,31 @@
+﻿
+
+Scene myTestScene {
+    list gameObject [
+    
+    ]
+}
+
+Prefab spaceShip {
+    list components [
+        MeshRenderer (Meshes.TheFrog, Materials.BlackRubber, Textures.spaceShipTexture),
+        PhysicsBody (10)
+        ShipStat (100, 20)
+    ]
+    
+}
+
+
+GameObject myObj {
+    children {
+        GameObject {
+            transform
+            components {
+            
+            }
+        }
+    }
+    components {
+    
+    }
+}
