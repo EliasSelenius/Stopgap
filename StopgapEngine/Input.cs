@@ -46,6 +46,8 @@ namespace Stopgap {
             FixedMouse(false);
         }
 
+        
+
         private static void Window_MouseDown(object sender, MouseButtonEventArgs e) {
             switch (e.Button) {
                 case MouseButton.Left:

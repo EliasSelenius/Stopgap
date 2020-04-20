@@ -111,14 +111,16 @@ namespace Stopgap.Editor {
         private static void InitGUI() {
             var c = Game.canvas = new Gui.Canvas();
 
-            //var h = c.Create<Element>();
-            var t = c.Create<TextBox>();
-            // t.font_size
-            t.size = vec2.one;
-            t.editable = true;
-            t.AppendText("Hello World");
+            var test = c.Create<TextBox>();
+            test.editable = true;
+            test.AppendText("Hello World");
 
-
+            var cmdLine = c.Create<TextBox>();
+            cmdLine.editable = true;
+            cmdLine.size.y = 0.5f;
+            cmdLine.size.x = 1;
+            cmdLine.pos.y = -0.75f;
+            cmdLine.pos.x = .5f;
         }
     }
 }

@@ -21,9 +21,17 @@ namespace Stopgap.Gui {
         public vec2 size = vec2.one;
         public vec2 pos = vec2.zero;
 
-        // size and pos is in normalized device coordinates
-        public vec2 size_ndc => new vec2(size.x * canvas.aspectRatio, size.y);
-        public vec2 pos_ndc => new vec2(pos.x * canvas.aspectRatio, pos.y);
+        // ndc is normalized device coordinates
+        public vec2 size_ndc {
+            get => new vec2(size.x * canvas.aspectRatio, size.y);
+            set => size = new vec2(value.x / canvas.aspectRatio, value.y);
+        }
+        public vec2 pos_ndc {
+            get => new vec2(pos.x * canvas.aspectRatio, pos.y);
+            set => pos = new vec2(value.x / canvas.aspectRatio, value.y);
+        }
+
+        public float aspect => size.y / size.x;
 
 
         public vec4 background_color = (.7f, .7f, .7f, 1);

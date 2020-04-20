@@ -91,6 +91,7 @@
     <Compile Include="Gui\Element.cs" />
     <Compile Include="Gui\Graphics.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="Vao_vbo_ebo.cs" />
     <Content Include="Markup\markupdraft.txt" />
     <Compile Include="Markup\Tokenizer.cs" />
     <Compile Include="Material.cs" />
