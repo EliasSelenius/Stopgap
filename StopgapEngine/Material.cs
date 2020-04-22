@@ -41,7 +41,7 @@ namespace Stopgap {
             shininess = 1f
         };
 
-        public static Material Suntest => new Material {
+        public static Material Greenglow => new Material {
             diffuseColor = new vec3(0.07568f, 0.61424f, 0.07568f),
             specular = new vec3(0.633f, 0.727811f, 0.633f),
             shininess = 0.6f,

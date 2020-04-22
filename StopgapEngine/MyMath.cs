@@ -12,7 +12,6 @@ using Nums;
 namespace Stopgap {
     public static class MyMath {
 
-
         public static bool InsideBounds(vec2 v, vec2 a, vec2 b) => InsideBounds(v.x, a.x, b.x) && InsideBounds(v.y, a.y, b.y);
         public static bool InsideBounds(float v, float a, float b) => (v < a) == (v > b);
 
@@ -28,6 +27,8 @@ namespace Stopgap {
         public static vec3 Transform(this OpenTK.Matrix4 m, vec3 a) {
             return (new Vector4(a.x, a.y, a.z, 1f) * m).Xyz.ToNumsVec();
         }
+
+        public static vec3 RandomDirection(int seed) => new vec3(Noise.Random(seed), Noise.Random(seed + 1), Noise.Random(seed + 2)).normalized;
 
     }
 }

@@ -158,11 +158,11 @@ namespace Stopgap {
 
         public void Subdivide(int subdivisions = 1) {
             for (int i = 0; i < subdivisions; i++)
-                fastSubdivide(); // subdivide();
+                subdivide(); 
             //GenNormals();
         }
 
-        private void fastSubdivide() {
+        private void subdivide() {
 
             int icount = indices.Count;
 
@@ -219,55 +219,7 @@ namespace Stopgap {
             }
         }
 
-        private void subdivide() {
-            var ts = Triangles;
-
-            this.vertices.Clear();
-            this.indices.Clear();
-
-            void _vertex(Vertex v) {
-                var i = vertices.IndexOf(v);
-                if (i == -1) {
-                    vertices.Add(v);
-                    i = vertices.Count - 1;
-                }
-                indices.Add((uint)i);
-            }
-
-            for (int i = 0; i < ts.Length; i++) {
-                var t = ts[i];
-
-                /*
-                  
-                       t.v3
-                        o
-                       / \
-                  vm2 o---o vm3
-                     / \ / \
-                    o---o---o
-                 t.v1  vm1   t.v2
-
-                 */
-
-                Vertex vm1 = t.v1.Lerp(t.v2, .5f),
-                       vm2 = t.v1.Lerp(t.v3, .5f),
-                       vm3 = t.v2.Lerp(t.v3, .5f);
-
-                // triangle 1 (lower left)
-                _vertex(t.v1); _vertex(vm1); _vertex(vm2);
-
-                // triangle 2 (middle)
-                _vertex(vm1); _vertex(vm3); _vertex(vm2);
-
-                // triangle 3 (lower right)
-                _vertex(vm1); _vertex(t.v2); _vertex(vm3);
-
-                // triangle 4 (top)
-                _vertex(vm2); _vertex(vm3); _vertex(t.v3);
-
-            }
-        }
-
+        
         private vec3 GenNormal(Tuple<uint, uint, uint> face) => GenNormal(face.Item1, face.Item2, face.Item3);
         private vec3 GenNormal(uint a, uint b, uint c) => GenNormal((int)a, (int)b, (int)c);
         private vec3 GenNormal(int a, int b, int c) => GenNormal(vertices[a], vertices[b], vertices[c]);

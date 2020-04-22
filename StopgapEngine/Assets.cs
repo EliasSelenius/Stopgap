@@ -69,6 +69,16 @@ namespace Stopgap {
             LoadPrefabs();
 
 
+            // add some default meshes
+            var m = Mesh.GenIcosphere();
+            m.Subdivide(2);
+            m.Mutate(v => {
+                v.pos = v.pos.normalized;
+                return v;
+            });
+            m.GenNormals();
+            AddMesh("sphere", m);
+
         }
 
         private static void LoadImages() {

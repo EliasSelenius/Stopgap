@@ -8,11 +8,12 @@ using Glow;
 
 namespace Stopgap.Gui {
     public class Canvas {
-        public static ShaderProgram guiShader;
+        internal static ShaderProgram rectShader;
+        internal static ShaderProgram textShader;
 
         static Canvas() {
-            guiShader = ShaderProgram.CreateProgram(Shaders.ShaderResources.guiFragment, Shaders.ShaderResources.guiVertex);
-            Assets.Shaders["gui"] = guiShader;
+            rectShader = ShaderProgram.CreateProgram(Shaders.ShaderResources.rectElementFragment, Shaders.ShaderResources.rectElementVertex);
+            textShader = ShaderProgram.CreateProgram(Shaders.ShaderResources.textFragment, Shaders.ShaderResources.textVertex);
         }
 
 
@@ -28,9 +29,6 @@ namespace Stopgap.Gui {
         }
 
         internal void Render() {
-
-            guiShader.Use();
-
             for (int i = 0; i < rootElements.Count; i++) {
                 rootElements[i].Render();
             }

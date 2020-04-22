@@ -73,7 +73,7 @@ namespace Stopgap.Editor {
                 var rigidbody = new GameObject();
                 var r = new Rigidbody();
                 const float pi = (float)Math.PI;
-                rigidbody.AddComps(r, new MeshRenderer(Assets.GetMesh("GalleonBoat"), Material.Suntest));
+                rigidbody.AddComps(r, new MeshRenderer(Assets.GetMesh("GalleonBoat"), Material.Greenglow));
                 rigidbody.EnterScene(Game.scene);
                 rigidbody.transform.position.y = 20;
 
@@ -90,12 +90,25 @@ namespace Stopgap.Editor {
                     return v;
                 });
                 pmesh.GenNormals();
-                planet.AddComps(new MeshRenderer(pmesh, Material.Default));
+                planet.AddComps(new MeshRenderer(pmesh, Material.Silver));
                 planet.EnterScene(Game.scene);
                 planet.transform.position = (0, 0, 500);
                 planet.transform.scale *= 100;
                 pmesh.Apply();
 
+
+                var billboard = new GameObject();
+                billboard.AddComp(new Billboard(Material.RedPlastic));
+                billboard.EnterScene(Game.scene);
+                billboard.transform.position = (0, 40, 0);
+                billboard.transform.scale *= 3;
+
+                var ps = new GameObject();
+                ps.AddComp(new ParticleSystem(Material.Greenglow, 40, 20) { 
+                    startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * Noise.Random((int)(Game.time * 1000f) + 3) * 3f,
+                });
+                ps.transform.position = (-40, 20, 0);
+                ps.EnterScene(Game.scene);
 
                 Renderer.renderNormals = false;
                 // init editor Gui
@@ -111,16 +124,43 @@ namespace Stopgap.Editor {
         private static void InitGUI() {
             var c = Game.canvas = new Gui.Canvas();
 
-            var test = c.Create<TextBox>();
+            /*var test = c.Create<TextBox>();
             test.editable = true;
             test.AppendText("Hello World");
+            */
 
             var cmdLine = c.Create<TextBox>();
+            cmdLine.background_color = (.3f, .3f, .3f, 1);
+            cmdLine.font_size = 6;
             cmdLine.editable = true;
-            cmdLine.size.y = 0.5f;
-            cmdLine.size.x = 1;
-            cmdLine.pos.y = -0.75f;
-            cmdLine.pos.x = .5f;
+            cmdLine.size.y = 0.08f;
+            cmdLine.size.x = 3;
+            cmdLine.pos.y = -0.96f;
+            var vars = new Dictionary<string, GameObject>();
+            cmdLine.OnInput += (t, e) => {
+                if (e.Key == OpenTK.Input.Key.Enter) {
+                    var text = t.text;
+                    t.RemoveText(0, text.Length);
+                    Console.WriteLine(text);
+                    var g = new GameObject();
+                    g.AddComps(new MeshRenderer(Assets.GetMesh("sphere"), Material.Default));
+                    g.EnterScene(Game.scene);
+                    vars[text] = g;
+                }
+            };
+
+            // FPS display:
+            var fpsd = c.Create<TextBox>();
+            fpsd.font_size = 6;
+            fpsd.size.y = 0.05f;
+            fpsd.size.x = 0.4f;
+            fpsd.pos.y = 0.95f;
+            fpsd.pos.x = -1f;
+            fpsd.draw_background = false;
+            fpsd.OnUpdate += e => {
+                fpsd.SetText("FPS: " + Math.Round(Game.window.RenderFrequency));
+            };
+
         }
     }
 }

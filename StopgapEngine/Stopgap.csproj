@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets.cs" />
+    <Compile Include="Billboard.cs" />
     <Compile Include="BlurFilter.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="CamFlyController.cs" />
@@ -91,7 +92,9 @@
     <Compile Include="Gui\Element.cs" />
     <Compile Include="Gui\Graphics.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="ParticleSystem.cs" />
     <Compile Include="Vao_vbo_ebo.cs" />
+    <Content Include="draft.txt" />
     <Content Include="Markup\markupdraft.txt" />
     <Compile Include="Markup\Tokenizer.cs" />
     <Compile Include="Material.cs" />
@@ -134,8 +137,10 @@
     <None Include="Shaders\debug\normalsFragment.glsl" />
     <None Include="Shaders\debug\normalsVertex.glsl" />
     <None Include="Shaders\fragement.glsl" />
-    <None Include="Shaders\guiFragment.glsl" />
-    <None Include="Shaders\guiVertex.glsl" />
+    <None Include="Shaders\Gui\rectElementFragment.glsl" />
+    <None Include="Shaders\Gui\rectElementVertex.glsl" />
+    <None Include="Shaders\Gui\textFragment.glsl" />
+    <None Include="Shaders\Gui\textVertex.glsl" />
     <None Include="Shaders\imageEffects\GaussianBlur.glsl" />
     <None Include="Shaders\imageFragment.glsl" />
     <None Include="Shaders\imageVertex.glsl" />
@@ -148,6 +153,7 @@
     <EmbeddedResource Include="Shaders\ShaderResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ShaderResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="TestData\Images.resx">
       <Generator>ResXFileCodeGenerator</Generator>

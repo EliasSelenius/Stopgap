@@ -1,0 +1,9 @@
+﻿
+ShaderProgram default {
+	vertex = "vertex.glsl"
+	fragment = "fragment.glsl"
+}
+
+Skybox nebula {
+	positive_z = 
+}

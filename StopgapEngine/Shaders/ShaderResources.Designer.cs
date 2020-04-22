@@ -118,7 +118,7 @@ namespace Stopgap.Shaders {
         ///
         ///out vec4 FragColor;
         ///  
-        ///in vec2 TexCoords;
+        ///in vec2 uv;
         ///
         ///uniform sampler2D image;
         ///  
@@ -128,12 +128,12 @@ namespace Stopgap.Shaders {
         ///void main()
         ///{             
         ///    vec2 tex_offset = 1.0 / textureSize(image, 0); // gets size of single texel
-        ///    vec3 result = texture(image, TexCoords).rgb * weight[0]; // current fragment&apos;s contribution
+        ///    vec3 result = texture(image, uv).rgb * weight[0]; // current fragment&apos;s contribution
         ///    if(horizontal)
         ///    {
         ///        for(int i = 1; i &lt; 5; ++i)
         ///        {
-        ///            resu [rest of string was truncated]&quot;;.
+        ///            result += texture( [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GaussianBlur {
             get {
@@ -142,69 +142,11 @@ namespace Stopgap.Shaders {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to #version 440 core
-        ///
-        ///uniform sampler2D font_atlas;
-        ///uniform bool is_text;
-        ///
-        ///uniform vec4 color;
-        ///
-        ///out vec4 out_color;
-        ///in vec2 uv;
-        ///
-        ///void main() {
-        ///
-        ///	vec4 c = color;
-        ///
-        ///	if (is_text) {
-        ///		c *= texture(font_atlas, uv);
-        ///		if (c.a &lt; 0.5) discard;		
-        ///	} else {
-        ///		float r = 0.0;
-        ///
-        ///		if (uv.y &lt; r &amp;&amp; uv.x &lt; r &amp;&amp; distance(uv, vec2(r)) &gt; r) discard;
-        ///		if (uv.y &gt; 1.0-r &amp;&amp; uv.x &gt; 1.0-r &amp;&amp; distance(uv, vec2(1.0-r)) &gt; r) discard;
-        ///
-        ///		if (uv.y &gt; 1.0-r &amp;&amp; uv.x &lt; r &amp;&amp; distance(uv, vec2(r, 1.0-r)) &gt; r) discard;
-        ///		i [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string guiFragment {
-            get {
-                return ResourceManager.GetString("guiFragment", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to #version 440 core
-        ///
-        ///// vec2 position, vec2 size
-        ///uniform vec4 rectTransform;
-        ///
-        ///layout (location = 0) in vec4 posuv;
-        ///
-        ///out vec2 uv;
-        ///
-        ///void main() {
-        ///	
-        ///	vec2 vp = posuv.xy;
-        ///
-        ///	vec2 pos = rectTransform.xy + vp * rectTransform.zw;
-        ///
-        ///	gl_Position = vec4(pos, 0.0, 1.0);
-        ///	uv = posuv.zw;
-        ///}.
-        /// </summary>
-        internal static string guiVertex {
-            get {
-                return ResourceManager.GetString("guiVertex", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to #version 330 core
         ///
         ///uniform sampler2D colorBuffer;
         ///uniform sampler2D brightnessBuffer;
+        ///uniform float exposure = 1.0;
         ///
         ///in vec2 uv;
         ///
@@ -214,14 +156,16 @@ namespace Stopgap.Shaders {
         ///	vec4 color = texture(colorBuffer, uv);
         ///	vec4 bColor = texture(brightnessBuffer, uv);
         ///	
+        ///	color += bColor;
+        ///
         ///	// tone mapping (HDR -&gt; LDR):
-        ///	color = color / (color + vec4(1.0));
+        ///	//color = color / (color + vec4(1.0));
+        ///	color = vec4(1.0) - exp(-color * exposure);
         ///
         ///	// gamma correction:
         ///	color.rgb = pow(color.rgb, vec3(1.0/2.2));
         ///
         ///	FragColor = color;
-        ///	//FragColor = bColor;
         ///}.
         /// </summary>
         internal static string imageFragment {
@@ -328,6 +272,62 @@ namespace Stopgap.Shaders {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to #version 440 core
+        ///
+        ///uniform sampler2D font_atlas;
+        ///
+        ///uniform vec4 color;
+        ///
+        ///out vec4 out_color;
+        ///in vec2 uv;
+        ///
+        ///void main() {
+        ///	vec4 c = color;
+        ///
+        ///	float r = 0.0;
+        ///
+        ///	if (uv.y &lt; r &amp;&amp; uv.x &lt; r &amp;&amp; distance(uv, vec2(r)) &gt; r) discard;
+        ///	if (uv.y &gt; 1.0-r &amp;&amp; uv.x &gt; 1.0-r &amp;&amp; distance(uv, vec2(1.0-r)) &gt; r) discard;
+        ///
+        ///	if (uv.y &gt; 1.0-r &amp;&amp; uv.x &lt; r &amp;&amp; distance(uv, vec2(r, 1.0-r)) &gt; r) discard;
+        ///	if (uv.y &lt; r &amp;&amp; uv.x &gt; 1.0-r &amp;&amp; distance(uv, vec2(1.0-r, r)) &gt; r) discard;
+        ///
+        ///	out_color = c;
+        ///}.
+        /// </summary>
+        internal static string rectElementFragment {
+            get {
+                return ResourceManager.GetString("rectElementFragment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #version 440 core
+        ///
+        ///// vec2 position, vec2 size
+        ///uniform vec4 rectTransform;
+        ///
+        ///layout (location = 0) in vec4 posuv;
+        ///
+        ///out vec2 uv;
+        ///
+        ///void main() {
+        ///	
+        ///	vec2 vp = posuv.xy;
+        ///
+        ///	vec2 pos = rectTransform.xy + vp * rectTransform.zw;
+        ///
+        ///	gl_Position = vec4(pos, 0.0, 1.0);
+        ///	uv = posuv.zw;
+        ///}.
+        /// </summary>
+        internal static string rectElementVertex {
+            get {
+                return ResourceManager.GetString("rectElementVertex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to #version 330 core 
         ///
         ///uniform samplerCube skybox;
@@ -368,6 +368,57 @@ namespace Stopgap.Shaders {
         internal static string skyboxVertex {
             get {
                 return ResourceManager.GetString("skyboxVertex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #version 440 core
+        ///
+        ///uniform sampler2D font_atlas;
+        ///
+        ///uniform vec4 color;
+        ///
+        ///out vec4 out_color;
+        ///in vec2 uv;
+        ///
+        ///void main() {
+        ///	vec4 c = color;
+        ///
+        ///    c *= texture(font_atlas, uv);
+        ///    if (c.a &lt; 0.5) discard;		
+        ///
+        ///	out_color = c;
+        ///}.
+        /// </summary>
+        internal static string textFragment {
+            get {
+                return ResourceManager.GetString("textFragment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #version 440 core
+        ///
+        ///// vec2 position, vec2 size
+        ///uniform vec4 rectTransform;
+        ///
+        ///layout (location = 0) in vec4 posuv;
+        ///
+        ///out vec2 uv;
+        ///
+        ///void main() {
+        ///	
+        ///	vec2 vp = posuv.xy;
+        ///
+        ///	vec2 pos = rectTransform.xy + vp * rectTransform.zw;
+        ///
+        ///	gl_Position = vec4(pos, 0.0, 1.0);
+        ///	uv = posuv.zw;
+        ///}.
+        /// </summary>
+        internal static string textVertex {
+            get {
+                return ResourceManager.GetString("textVertex", resourceCulture);
             }
         }
         

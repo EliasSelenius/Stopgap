@@ -124,12 +124,6 @@
   <data name="GaussianBlur" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>imageEffects\GaussianBlur.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="guiFragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>guiFragment.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="guiVertex" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>guiVertex.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="imageFragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>imageFragment.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -145,11 +139,23 @@
   <data name="normalsVertex" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>debug\normalsVertex.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="rectElementFragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Gui\rectElementFragment.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="rectElementVertex" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Gui\rectElementVertex.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="skyboxFragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>skyboxFragment.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="skyboxVertex" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>skyboxVertex.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="textFragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Gui\textFragment.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="textVertex" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Gui\textVertex.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="vertex" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>vertex.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>

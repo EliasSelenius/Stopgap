@@ -1,0 +1,21 @@
+﻿
+engine features:
+	billboards
+		can be used for:
+		grass 
+		enemy health bar
+		damageindicator
+		waypoint
+
+	ParticleSystem
+		instancing
+
+	collision detection
+		colliders
+			spehere
+			AABB
+			Mesh
+		raycasting
+
+	sub-objects
+		must transform correctly

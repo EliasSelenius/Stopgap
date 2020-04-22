@@ -33,24 +33,23 @@ namespace Stopgap.Gui {
 
         public float aspect => size.y / size.x;
 
-
+        public bool draw_background = true;
         public vec4 background_color = (.7f, .7f, .7f, 1);
         public bool Visible = true;
         public bool Active = true;
 
 
         protected virtual void ConnectedToParent() { }
-        protected virtual void OnHover() {
-            //background_color = (0, 1, 0, 1);
-        }
-        protected virtual void OnClick() {
-            Console.WriteLine("click");
-            //background_color = (0, 0, 1, 1);
-        }
-        protected virtual void OnUpdate() { }
-        protected virtual void OnRender() { }
-        protected virtual void OnFocus() { }
-        protected virtual void OnLostFocus() { }
+
+        protected virtual void Update() { }
+        protected virtual void Draw() { }
+
+        public event Action<Element> OnHover;
+        public event Action<Element> OnClick;
+        public event Action<Element> OnFocus;
+        public event Action<Element> OnUnfocus;
+        public event Action<Element> OnUpdate;
+        public event Action<Element> OnRender;
 
         internal static T Create<T>(Canvas c) where T : Element, new() {
             T t = new T();
@@ -78,17 +77,22 @@ namespace Stopgap.Gui {
             }*/
 
             vec2 p = pos_ndc, s = size_ndc;
-            Canvas.guiShader.SetVec4("rectTransform", p.x, p.y, s.x, s.y);
-            Canvas.guiShader.SetVec4("color", background_color);
+            Canvas.rectShader.SetVec4("rectTransform", p.x, p.y, s.x, s.y);
+            Canvas.rectShader.SetVec4("color", background_color);
         }
 
         internal void Render() {
 
             if (!Visible) return;
 
-            ApplyUniforms();
-            Graphics.RenderRect(); // for debug
-            OnRender();
+            if (draw_background) {
+                Canvas.rectShader.Use();
+                ApplyUniforms();
+                Graphics.RenderRect();
+            }
+
+            Draw();
+            OnRender?.Invoke(this);
 
             for (int i = 0; i < children.Count; i++) {
                 children[i].Render();
@@ -97,16 +101,16 @@ namespace Stopgap.Gui {
 
         public void Focus() {
             if (canvas.focusedElement != this) {
-                canvas.focusedElement?.OnLostFocus();
+                canvas.focusedElement?.OnUnfocus(canvas.focusedElement);
                 canvas.focusedElement = this;
-                OnFocus();
+                OnFocus?.Invoke(this);
             }
         }
 
         public void Unfocus() {
             if (IsInFocus) {
                 canvas.focusedElement = null;
-                OnLostFocus();
+                OnUnfocus?.Invoke(this);
             }
         }
 
@@ -117,9 +121,9 @@ namespace Stopgap.Gui {
             var mp = Input.MousePos_ndc;
             var hs = size_ndc * .5f;
             if (MyMath.InsideBounds(mp, pos_ndc - hs, pos_ndc + hs)) {
-                this.OnHover();
+                this.OnHover?.Invoke(this);
                 if (Input.LeftMousePressed) {
-                    this.OnClick();
+                    this.OnClick?.Invoke(this);
                     this.Focus();       
                 } 
             } else {
@@ -128,7 +132,8 @@ namespace Stopgap.Gui {
                 }
             }
 
-            OnUpdate();
+            Update();
+            OnUpdate?.Invoke(this);
 
             for (int i = 0; i < children.Count; i++) {
                 children[i].UpdateEvents();

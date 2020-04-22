@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -13,9 +15,10 @@ namespace Stopgap.Gui {
     public class TextBox : Element {
 
         public readonly Font font = Font.Arial;
-        public readonly float lineSpace = .12f;
-        public readonly float font_size = .6f;
+        public float lineSpace = .12f;
+        public float font_size = .6f;
 
+        public string text { get; private set; }
         private readonly List<Quad> quads = new List<Quad>();
 
         private VertexArray vao;
@@ -43,13 +46,16 @@ namespace Stopgap.Gui {
             vao.SetBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
             vao.SetBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
 
-            vao.AttribPointer(Canvas.guiShader.GetAttribLocation("posuv"), 4, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
+            vao.AttribPointer(Canvas.rectShader.GetAttribLocation("posuv"), 4, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
 
             Game.window.KeyPress += Window_KeyPress;
+            Game.window.KeyDown += Window_KeyDown;
+            base.OnFocus += TextBox_OnFocus;
+            base.OnUnfocus += TextBox_OnUnfocus;
 
             vve_cursor = new Vao_vbo_ebo<vec4>();
-            vve_cursor.AttribPointer(Canvas.guiShader.GetAttribLocation("posuv"), 4, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
+            vve_cursor.AttribPointer(Canvas.rectShader.GetAttribLocation("posuv"), 4, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
             addQuadData(new Quad(font.GetChar('_')), 0, vve_cursor.vertices, vve_cursor.indices);
             vve_cursor.Apply();
 
@@ -96,6 +102,7 @@ namespace Stopgap.Gui {
             void _addv(vec4 v) {
                 v.xy *= font_size;
                 v.x *= aspect;
+                
                 v.xy += cursor;
                 vertices.Add(v);
             }
@@ -124,7 +131,7 @@ namespace Stopgap.Gui {
 
                 addQuadData(quad, (uint)i, vertices, indices);
 
-                cursor.x += quad.glyph.advance * aspect * font_size;
+                cursor.x += quad.glyph.advance * font_size * aspect;
                 var next = i == quads.Count - 1 ? 0 : quads[i + 1].glyph.size.x;
                 if (cursor.x + next > hs.x) {
                     cursor.x = -hs.x;
@@ -141,10 +148,12 @@ namespace Stopgap.Gui {
 
         private void addChar(char c) {
             quads.Add(new Quad(font.GetChar(c)));
+            text += c;
         }
 
         public void InsertText(int index, string text) {
             quads.InsertRange(index, getQuads(text));
+            text.Insert(index, text);
             Apply();
         }
 
@@ -153,18 +162,35 @@ namespace Stopgap.Gui {
             Apply();
         }
 
-        
-        protected override void OnFocus() {
-            if (editable) currently_editing = true;
+        public void RemoveText(int index, int count) {
+            quads.RemoveRange(index, count);
+            text = text.Remove(index, count);
+            Apply();
         }
 
-        protected override void OnLostFocus() {
+        public void SetText(string text) {
+            quads.Clear();
+            this.text = "";
+            foreach (var item in text) addChar(item);
+            Apply();
+        }
+        
+
+        private void TextBox_OnFocus(Element obj) {
+            if (editable) currently_editing = true;
+        }
+        private void TextBox_OnUnfocus(Element obj) {
             currently_editing = false;
         }
 
-        protected override void OnRender() {
-            Canvas.guiShader.SetBool("is_text", true);
-            Canvas.guiShader.SetVec4("color", text_color);
+
+        protected override void Draw() {
+
+            Canvas.textShader.Use();
+
+            vec2 p = pos_ndc, s = size_ndc;
+            Canvas.textShader.SetVec4("rectTransform", p.x, p.y, s.x, s.y);
+            Canvas.textShader.SetVec4("color", text_color);
             font.Atlas.Bind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
             vao.DrawElements(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, indices.Count, OpenTK.Graphics.OpenGL4.DrawElementsType.UnsignedInt);
 
@@ -172,18 +198,28 @@ namespace Stopgap.Gui {
             if (currently_editing) {
                 vec2 c = cursor;
                 c.x *= canvas.aspectRatio;
-                vec2 p = pos_ndc + c, s = size_ndc;
-                Canvas.guiShader.SetVec4("rectTransform", p.x, p.y, s.x, s.y);
+                p += c;
+                Canvas.textShader.SetVec4("rectTransform", p.x, p.y, s.x, s.y);
                 vve_cursor.Draw(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles);
             }
 
             Texture2D.Unbind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
-            Canvas.guiShader.SetBool("is_text", false);
         }
+
+        public event Action<TextBox, OpenTK.Input.KeyboardKeyEventArgs> OnInput;
 
         private void Window_KeyPress(object sender, OpenTK.KeyPressEventArgs e) {
             if (currently_editing) {
                 AppendText(e.KeyChar.ToString());
+            }
+        }
+
+        private void Window_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e) {
+            if (currently_editing) {
+                OnInput(this, e);
+                if (e.Key == OpenTK.Input.Key.BackSpace && quads.Count > 0) {
+                    RemoveText(quads.Count - 1, 1); 
+                }
             }
         }
     }

@@ -60,6 +60,7 @@
     </None>
     <None Include="data\models\GalleonBoat.mtl" />
     <None Include="data\models\GalleonBoat.obj" />
+    <None Include="data\test.assets" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
