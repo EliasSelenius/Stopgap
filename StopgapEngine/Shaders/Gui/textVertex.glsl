@@ -1,7 +1,7 @@
 #version 440 core
 
 // vec2 position, vec2 size
-uniform vec4 rectTransform;
+uniform vec2 textPosition;
 
 layout (location = 0) in vec4 posuv;
 
@@ -11,7 +11,7 @@ void main() {
 	
 	vec2 vp = posuv.xy;
 
-	vec2 pos = rectTransform.xy + vp * rectTransform.zw;
+	vec2 pos = textPosition + vp;
 
 	gl_Position = vec4(pos, 0.0, 1.0);
 	uv = posuv.zw;

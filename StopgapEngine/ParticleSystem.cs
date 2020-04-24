@@ -48,6 +48,7 @@ namespace Stopgap {
             this.material = material;
             this.spawnRate = spawnRate;
             this.lifetime = lifetime;
+
         }
 
         public override void OnEnter() => Renderer.SetObject(gameObject.scene, Renderer.defaultShader, this);

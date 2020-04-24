@@ -9,6 +9,7 @@ engine features:
 
 	ParticleSystem
 		instancing
+		blending (transparancy)
 
 	collision detection
 		colliders
@@ -19,3 +20,8 @@ engine features:
 
 	sub-objects
 		must transform correctly
+
+
+optimalization techniques:
+	threading
+	compute shader

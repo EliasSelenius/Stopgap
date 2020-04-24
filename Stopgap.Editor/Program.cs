@@ -65,6 +65,7 @@ namespace Stopgap.Editor {
                     g.transform.position = new Nums.vec3(Nums.Noise.Random(i),
                                                          Nums.Noise.Random(i + 1),
                                                          Nums.Noise.Random(i + 2)) * 500;
+                    g.AddComps(new Rigidbody { Mass = 10f, Velocity = (30, 0, 0) }, new GravitationalObject());
                     g.transform.scale *= Noise.Random(i)*7 + 20;
                     g.EnterScene(Game.scene);
                 }
@@ -90,9 +91,9 @@ namespace Stopgap.Editor {
                     return v;
                 });
                 pmesh.GenNormals();
-                planet.AddComps(new MeshRenderer(pmesh, Material.Silver));
+                planet.AddComps(new MeshRenderer(pmesh, Material.Silver), new Rigidbody { Mass = 10000f }, new GravitationalObject());
                 planet.EnterScene(Game.scene);
-                planet.transform.position = (0, 0, 500);
+                planet.transform.position = (0, 0, 700);
                 planet.transform.scale *= 100;
                 pmesh.Apply();
 
@@ -131,11 +132,11 @@ namespace Stopgap.Editor {
 
             var cmdLine = c.Create<TextBox>();
             cmdLine.background_color = (.3f, .3f, .3f, 1);
-            cmdLine.font_size = 6;
+            cmdLine.font_size = .3f;
             cmdLine.editable = true;
-            cmdLine.size.y = 0.08f;
-            cmdLine.size.x = 3;
-            cmdLine.pos.y = -0.96f;
+            cmdLine.size.y = unit.parse("0.05vh");
+            cmdLine.size.x = unit.parse("0.9vw");
+            cmdLine.pos.y = unit.parse("-0.4vh");
             var vars = new Dictionary<string, GameObject>();
             cmdLine.OnInput += (t, e) => {
                 if (e.Key == OpenTK.Input.Key.Enter) {
@@ -151,16 +152,21 @@ namespace Stopgap.Editor {
 
             // FPS display:
             var fpsd = c.Create<TextBox>();
-            fpsd.font_size = 6;
-            fpsd.size.y = 0.05f;
-            fpsd.size.x = 0.4f;
-            fpsd.pos.y = 0.95f;
-            fpsd.pos.x = -1f;
+            fpsd.font_size = 0.3f;
+            fpsd.size = unit2.parse("0.1vw 0.03vh");
+            fpsd.pos = unit2.parse("-0.5vw 0.5vh");
+            fpsd.anchor = Anchor.top_left;
             fpsd.draw_background = false;
             fpsd.OnUpdate += e => {
                 fpsd.SetText("FPS: " + Math.Round(Game.window.RenderFrequency));
             };
 
+
+            // test:
+            var testel = c.Create<TextBox>();
+            testel.editable = true;
+            testel.font_size = 2;
+            testel.anchor = Anchor.bottom_right;
         }
     }
 }

@@ -77,6 +77,8 @@ namespace Stopgap {
                 return v;
             });
             m.GenNormals();
+         
+
             AddMesh("sphere", m);
 
         }

@@ -35,7 +35,7 @@ namespace Stopgap {
         public Matrix4 projection { get; private set; }
         public float FOV = 70;
         public float NearPlane = .1f;
-        public float FarPlane = 2000;
+        public float FarPlane = 100000;
 
         public void SetToMain() {
             MainCamera = this;

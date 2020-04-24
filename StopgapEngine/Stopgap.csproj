@@ -11,6 +11,7 @@
     <RootNamespace>Stopgap</RootNamespace>
     <AssemblyName>Stopgap</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <LangVersion>8.0</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
@@ -88,9 +89,11 @@
     <Compile Include="DirectionalLight.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameObject.cs" />
+    <Compile Include="GravitationalObject.cs" />
     <Compile Include="Gui\Canvas.cs" />
     <Compile Include="Gui\Element.cs" />
     <Compile Include="Gui\Graphics.cs" />
+    <Compile Include="Gui\Unit.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="Vao_vbo_ebo.cs" />

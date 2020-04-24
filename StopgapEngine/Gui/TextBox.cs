@@ -5,6 +5,7 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,18 +17,19 @@ namespace Stopgap.Gui {
 
         public readonly Font font = Font.Arial;
         public float lineSpace = .12f;
-        public float font_size = .6f;
+        public float font_size = 0.6f;
 
-        public string text { get; private set; }
+        public string text { get; private set; } = "";
         private readonly List<Quad> quads = new List<Quad>();
 
         private VertexArray vao;
         private Buffer<vec4> vbo;
         private Buffer<uint> ebo;
 
-        private Vao_vbo_ebo<vec4> vve_cursor;
 
         private vec2 cursor;
+        private int cursorIndex = -1;
+        private Quad cursor_quad;
 
         private List<vec4> vertices = new List<vec4>();
         private List<uint> indices = new List<uint>();
@@ -54,15 +56,12 @@ namespace Stopgap.Gui {
             base.OnFocus += TextBox_OnFocus;
             base.OnUnfocus += TextBox_OnUnfocus;
 
-            vve_cursor = new Vao_vbo_ebo<vec4>();
-            vve_cursor.AttribPointer(Canvas.rectShader.GetAttribLocation("posuv"), 4, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
-            addQuadData(new Quad(font.GetChar('_')), 0, vve_cursor.vertices, vve_cursor.indices);
-            vve_cursor.Apply();
-
-
+            this.initCursor();
         }
 
-        
+        private void initCursor() {
+            cursor_quad = new Quad(font.GetChar('|'));
+        }
 
         public class Quad {
 
@@ -101,7 +100,7 @@ namespace Stopgap.Gui {
         private void addQuadData(Quad quad, uint quadIndex, List<vec4> vertices, List<uint> indices) {
             void _addv(vec4 v) {
                 v.xy *= font_size;
-                v.x *= aspect;
+                v.x *= canvas.aspectRatio;
                 
                 v.xy += cursor;
                 vertices.Add(v);
@@ -123,15 +122,24 @@ namespace Stopgap.Gui {
             vertices.Clear();
             indices.Clear();
 
-            var hs = vec2.one * .5f;
+            var hs = size_ndc * .5f;
             cursor = new vec2(-hs.x, hs.y);
 
+            uint quadsCount = 0;
             for (int i = 0; i < quads.Count; i++) {
+
+                // place cursor
+                if (cursorIndex == i) {
+                    addQuadData(cursor_quad, quadsCount, vertices, indices);
+                    quadsCount++;
+                }
+                
                 var quad = quads[i];
 
-                addQuadData(quad, (uint)i, vertices, indices);
+                addQuadData(quad, quadsCount, vertices, indices);
+                quadsCount++;
 
-                cursor.x += quad.glyph.advance * font_size * aspect;
+                cursor.x += quad.glyph.advance * font_size * canvas.aspectRatio;
                 var next = i == quads.Count - 1 ? 0 : quads[i + 1].glyph.size.x;
                 if (cursor.x + next > hs.x) {
                     cursor.x = -hs.x;
@@ -139,8 +147,15 @@ namespace Stopgap.Gui {
                 }
             }
 
+            // place cursor
+            if (cursorIndex == quads.Count) 
+                addQuadData(cursor_quad, quadsCount, vertices, indices);
+
+
             vbo.Initialize(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
             ebo.Initialize(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
+
+            //reInitCursor();
         }
 
         private IEnumerable<Quad> getQuads(string text) => text.Select(x => new Quad(font.GetChar(x)));
@@ -149,6 +164,12 @@ namespace Stopgap.Gui {
         private void addChar(char c) {
             quads.Add(new Quad(font.GetChar(c)));
             text += c;
+            cursorIndex++;
+        }
+        private void subChar(int index) {
+            quads.RemoveAt(index);
+            text = text.Remove(index);
+            cursorIndex--;
         }
 
         public void InsertText(int index, string text) {
@@ -177,10 +198,16 @@ namespace Stopgap.Gui {
         
 
         private void TextBox_OnFocus(Element obj) {
-            if (editable) currently_editing = true;
+            if (editable) {
+                currently_editing = true;
+                cursorIndex = text.Length;
+                Apply();
+            } 
         }
         private void TextBox_OnUnfocus(Element obj) {
             currently_editing = false;
+            cursorIndex = -1;
+            Apply();
         }
 
 
@@ -188,21 +215,10 @@ namespace Stopgap.Gui {
 
             Canvas.textShader.Use();
 
-            vec2 p = pos_ndc, s = size_ndc;
-            Canvas.textShader.SetVec4("rectTransform", p.x, p.y, s.x, s.y);
+            Canvas.textShader.SetVec2("textPosition", pos_ndc);
             Canvas.textShader.SetVec4("color", text_color);
             font.Atlas.Bind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
             vao.DrawElements(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, indices.Count, OpenTK.Graphics.OpenGL4.DrawElementsType.UnsignedInt);
-
-            // draw cursor:
-            if (currently_editing) {
-                vec2 c = cursor;
-                c.x *= canvas.aspectRatio;
-                p += c;
-                Canvas.textShader.SetVec4("rectTransform", p.x, p.y, s.x, s.y);
-                vve_cursor.Draw(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles);
-            }
-
             Texture2D.Unbind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
         }
 
@@ -216,9 +232,15 @@ namespace Stopgap.Gui {
 
         private void Window_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e) {
             if (currently_editing) {
-                OnInput(this, e);
+                OnInput?.Invoke(this, e);
                 if (e.Key == OpenTK.Input.Key.BackSpace && quads.Count > 0) {
                     RemoveText(quads.Count - 1, 1); 
+                } else {
+                    if (e.Key == OpenTK.Input.Key.Left && cursorIndex != 0) {
+                        cursorIndex--; Apply();
+                    } else if (e.Key == OpenTK.Input.Key.Right && cursorIndex != text.Length) { 
+                        cursorIndex++; Apply();
+                    }
                 }
             }
         }

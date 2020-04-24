@@ -8,6 +8,15 @@ using System.Threading.Tasks;
 using Nums;
 
 namespace Stopgap.Gui {
+
+    public enum Anchor {
+        top_left,
+        top_right,
+        bottom_left,
+        bottom_right,
+        center
+    }
+
     public class Element {
 
         public Canvas canvas { get; private set; }
@@ -18,10 +27,22 @@ namespace Stopgap.Gui {
         public bool HasParent => parent != null;
         public bool IsInFocus => canvas.focusedElement == this;
 
-        public vec2 size = vec2.one;
-        public vec2 pos = vec2.zero;
+        public Anchor anchor = Anchor.center;
+        public unit2 size = new unit2(UnitType.viewHeight, .5f, .5f);
+        public unit2 pos = new unit2(UnitType.ndc, 0, 0);
+        public vec2 size_ndc => size.get_ndc(this);
+        public vec2 pos_ndc => anchor switch {
+            Anchor.top_left => pos.get_ndc(this) + size_ndc * new vec2(.5f, -.5f),
+            Anchor.top_right => pos.get_ndc(this) + size_ndc * new vec2(-.5f, -.5f),
+            Anchor.bottom_left => pos.get_ndc(this) + size_ndc * .5f,
+            Anchor.bottom_right => pos.get_ndc(this) + size_ndc * new vec2(-.5f, .5f),
+            Anchor.center => pos.get_ndc(this)
+        };
+            
+
 
         // ndc is normalized device coordinates
+        /*
         public vec2 size_ndc {
             get => new vec2(size.x * canvas.aspectRatio, size.y);
             set => size = new vec2(value.x / canvas.aspectRatio, value.y);
@@ -29,9 +50,9 @@ namespace Stopgap.Gui {
         public vec2 pos_ndc {
             get => new vec2(pos.x * canvas.aspectRatio, pos.y);
             set => pos = new vec2(value.x / canvas.aspectRatio, value.y);
-        }
+        }*/
 
-        public float aspect => size.y / size.x;
+        //public float aspect => size.y / size.x;
 
         public bool draw_background = true;
         public vec4 background_color = (.7f, .7f, .7f, 1);
@@ -39,6 +60,7 @@ namespace Stopgap.Gui {
         public bool Active = true;
 
 
+        protected virtual void OnConnected() { }
         protected virtual void ConnectedToParent() { }
 
         protected virtual void Update() { }
@@ -54,6 +76,7 @@ namespace Stopgap.Gui {
         internal static T Create<T>(Canvas c) where T : Element, new() {
             T t = new T();
             t.canvas = c;
+            t.OnConnected();
             return t;
         }
 
@@ -127,7 +150,7 @@ namespace Stopgap.Gui {
                     this.Focus();       
                 } 
             } else {
-                if (Input.LeftMousePressed) {
+                if (Input.LeftMousePressed || Input.RightMousePressed) {
                     this.Unfocus();
                 }
             }
