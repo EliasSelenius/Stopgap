@@ -50,8 +50,24 @@ namespace Stopgap {
         private static void Window_Load(object sender, EventArgs e) {
             Assets.Load();
             onLoad();
+            CreateDebugGUI();
         }
 
+        private static void CreateDebugGUI() {
+
+            var c = Game.canvas ??= new Gui.Canvas();
+
+            // FPS display:
+            var fpsd = c.Create<Gui.TextBox>();
+            fpsd.font_size = 0.25f;
+            fpsd.size = Gui.unit2.parse("0.1vw 0.03vh");
+            fpsd.pos = Gui.unit2.parse("-0.5vw 0.5vh");
+            fpsd.anchor = Gui.Anchor.top_left;
+            fpsd.draw_background = false;
+            fpsd.OnUpdate += e => {
+                fpsd.SetText("FPS: " + Math.Round(Game.window.RenderFrequency));
+            };
+        }
 
         private static void Window_UpdateFrame(object sender, FrameEventArgs e) {
             time += (deltaTime = (float)e.Time);

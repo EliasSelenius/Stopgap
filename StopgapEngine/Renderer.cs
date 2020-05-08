@@ -48,8 +48,7 @@ namespace Stopgap {
 
             //GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
-            //GL.DepthFunc(DepthFunction.Lequal);
-
+            GL.DepthFunc(DepthFunction.Lequal);
 
             // clear color will always be black, as any other value fucks up my bloom. use a skybox to get background color 
             GL.ClearColor(0, 0, 0, 1);
@@ -220,7 +219,7 @@ namespace Stopgap {
             }
 
             // skybox
-            //Game.scene.skybox?.Render();
+            Game.scene.skybox?.Render();
         }
 
         #region rendring groups controll funcs

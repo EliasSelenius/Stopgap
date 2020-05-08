@@ -75,11 +75,11 @@ namespace Stopgap {
         }
 
         public void Rotate(vec3 axis, float angle) {
-            rotation *= Quaternion.FromAxisAngle(axis.ToOpenTKVec(), angle);
+            rotation = Quaternion.FromAxisAngle(axis.ToOpenTKVec(), angle) * rotation;
         }
 
         public void Rotate(vec3 euler) {
-            rotation *= Quaternion.FromEulerAngles(euler.ToOpenTKVec());
+            rotation = Quaternion.FromEulerAngles(euler.ToOpenTKVec()) * rotation;
         }
 
 

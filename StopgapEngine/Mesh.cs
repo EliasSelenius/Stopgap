@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using Nums;
 using Glow;
 
+
 namespace Stopgap {
     [StructLayout(LayoutKind.Sequential)]
     public struct Vertex {
@@ -22,7 +23,6 @@ namespace Stopgap {
         public Vertex Lerp(Vertex other, float time) {
             return new Vertex(pos.lerp(other.pos, time), uv.lerp(other.uv, time), normal.lerp(other.normal, time));
         }
-
     }
 
 
@@ -378,6 +378,49 @@ namespace Stopgap {
                 }
             }*/
 
+            return m;
+        }
+        
+        public static Mesh GenSphere(int size) {
+            var m = new Mesh();
+
+            var vertfunc = new Func<vec3, vec3>[] {
+                v => v,
+                v => v.zyx * new vec3(1, -1, 1),
+                v => v.yzx,
+                v => v.yxz * new vec3(-1, 1, 1),
+                v => v.zxy,
+                v => v.xzy * new vec3(1, 1, -1)
+            };
+
+            for (int f = 0; f < 6; f++) {
+                int i = (size * size) * f;
+                for (int x = 0; x < size; x++) {
+                    for (int z = 0; z < size; z++) {
+
+                        vec3 v = new vec3((float)x / (size - 1) - 0.5f, 0.5f, (float)z / (size - 1) - 0.5f).normalized;
+
+                        m.AddVertex(
+                            vertfunc[f](v), // pos
+                            new vec2((float)x / size, (float)z / size), // uv
+                            vec3.unity); // normal
+
+
+                        if (x < size - 1 && z < size - 1) {
+                            m.AddTriangle(
+                                i,
+                                i + 1,
+                                i + size + 1);
+                            m.AddTriangle(
+                                i,
+                                i + size + 1,
+                                i + size);
+                        }
+                        i++;
+                    }
+                }
+            }
+            m.GenNormals();
             return m;
         }
 

@@ -38,7 +38,8 @@ namespace Stopgap {
 
         public static bool LeftMousePressed { get; private set; }
         public static bool RightMousePressed { get; private set; }
-
+        public static bool MiddelMousePressed { get; private set; }
+       
         internal static void InitEvents() {
             Game.window.MouseMove += Window_MouseMove;
             Game.window.MouseWheel += Window_MouseWheel;
@@ -54,6 +55,7 @@ namespace Stopgap {
                     LeftMousePressed = true;
                     break;
                 case MouseButton.Middle:
+                    MiddelMousePressed = true;
                     break;
                 case MouseButton.Right:
                     RightMousePressed = true;
@@ -103,7 +105,7 @@ namespace Stopgap {
 
             // reset data:
             MouseWheelDelta = 0;
-            LeftMousePressed = RightMousePressed = false;
+            LeftMousePressed = RightMousePressed = MiddelMousePressed = false;
 
             if (IsFixedMouse) {
                 var c = screenCenter;

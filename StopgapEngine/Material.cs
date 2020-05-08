@@ -31,6 +31,8 @@ namespace Stopgap {
 
             shader.SetVec3("material.specular", specular);
             shader.SetFloat("material.shininess", shininess);
+
+            shader.SetVec4("tint", vec4.zero);
         }
 
 

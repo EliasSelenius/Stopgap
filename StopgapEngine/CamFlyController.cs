@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Glow;
 using Nums;
 
 namespace Stopgap {
@@ -16,10 +16,11 @@ namespace Stopgap {
         public override void Update() {
 
 
-
             if (Input.MouseRightButtonDown) {
                 Input.FixedMouse(true);
-                transform.Rotate(new vec3(Input.MouseDelta.y / 100f, -Input.MouseDelta.x / 100f, -Input.KeyAxis(OpenTK.Input.Key.Q, OpenTK.Input.Key.E) / 10f));
+                var zrotinput = -Input.KeyAxis(OpenTK.Input.Key.Q, OpenTK.Input.Key.E) / 10f;
+                transform.Rotate(vec3.unity, -Input.MouseDelta.x / 100f);
+                transform.Rotate(transform.right, Input.MouseDelta.y / 100f);
 
                 float speed = .4f;
                 if (Input.IsKeyDown(OpenTK.Input.Key.LShift)) {

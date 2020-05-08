@@ -87,7 +87,7 @@ uniform DirLight dirLight;
 uniform vec3 cam_pos;
 
 uniform Material material;
-
+uniform vec4 tint;
 
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 BrightColor;
@@ -99,12 +99,13 @@ void main() {
 	color += CalcDirLight(dirLight, vInput.normal, camdir, material);
 	//color += CalcPointLight(pointLight, normal, fragPos, camdir);
 	
-	FragColor = vec4(color, 1.0);
+	FragColor = vec4(color, 1.0) + tint;
 
 
 	// create brightness color
 	float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
 	BrightColor = vec4(FragColor.rgb * step(1.0, brightness), 1.0);
+	//BrightColor = vec4(material.emission, 1.0);
 }
 
 

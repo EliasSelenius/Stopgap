@@ -8,6 +8,7 @@ using OpenTK;
 
 
 using Nums;
+using System.Net;
 
 namespace Stopgap {
     public static class MyMath {
@@ -28,7 +29,12 @@ namespace Stopgap {
             return (new Vector4(a.x, a.y, a.z, 1f) * m).Xyz.ToNumsVec();
         }
 
-        public static vec3 RandomDirection(int seed) => new vec3(Noise.Random(seed), Noise.Random(seed + 1), Noise.Random(seed + 2)).normalized;
+        private static int seed = int.MinValue;
 
+        public static vec3 RandomDirection() => RandomDirection(seed++);
+        public static vec3 RandomDirection(int seed) => new vec3(Noise.Random(seed), Noise.Random(seed + 1), Noise.Random(seed + 2)).normalized;
+        public static float RandomRange(float minmag, float maxmag) => minmag + (Noise.Random(seed++) * 0.5f + 1f) * (maxmag - minmag);
+        public static vec3 RandomVector(float minmag, float maxmag) => RandomDirection() * RandomRange(minmag, maxmag);
+        public static float Random() => Noise.Random(seed++);
     }
 }

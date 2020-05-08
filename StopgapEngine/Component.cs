@@ -34,5 +34,6 @@ namespace Stopgap {
         /// </summary>
         public virtual void Update() { }
 
+        public virtual void OnCollision(Collider other) { }
     }
 }

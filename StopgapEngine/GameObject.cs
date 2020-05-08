@@ -35,6 +35,15 @@ namespace Stopgap {
 
         private readonly List<Component> _components = new List<Component>();
         public ReadOnlyCollection<Component> components => _components.AsReadOnly();
+        
+        public Rigidbody rigidbody { get; private set; }
+        private readonly List<Collider> _colliders = new List<Collider>();
+        public ReadOnlyCollection<Collider> colliders => _colliders.AsReadOnly();
+
+
+        public GameObject(params Component[] comps) {
+            AddComps(comps);
+        }
 
         public T GetComponent<T>() where T : Component {
             return (from c in _components
@@ -64,8 +73,16 @@ namespace Stopgap {
         public void AddComp(Component c) {
             if (c.gameObject != null)
                 throw new Exception("Component is already attached to a object");
+
+            if (c is Rigidbody r) rigidbody = r;
+            else if (c is Collider col) _colliders.Add(col);
+
             _components.Add(c);
-             c.Init(this);
+            c.Init(this);
+            if (HasStarted) { 
+                c.Start();
+                if (scene != null) c.OnEnter();
+            }
         }
 
         public void AddComps(params Component[] comps) {
@@ -118,7 +135,10 @@ namespace Stopgap {
             scene = null;
         }
 
-
-
+        internal void OnCollision(Collider other) {
+            for (int i = 0; i < _components.Count; i++) {
+                _components[i].OnCollision(other);
+            }
+        }
     }
 }

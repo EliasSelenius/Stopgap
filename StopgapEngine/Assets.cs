@@ -58,7 +58,8 @@ namespace Stopgap {
             // add some default shader assets:
             ShaderSourceFiles["defaultVertex"] = Stopgap.Shaders.ShaderResources.vertex;
             ShaderSourceFiles["defaultFragment"] = Stopgap.Shaders.ShaderResources.fragement;
-            
+            ShaderSourceFiles["skyboxVertex"] = Stopgap.Shaders.ShaderResources.skyboxVertex;
+
             ProcessShaders();
             CompileShadersFromConfig();
 

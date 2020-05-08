@@ -4,7 +4,10 @@ uniform samplerCube skybox;
 
 in vec3 texCoords;
 
-out vec4 color;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
+
 void main() {
-	color = texture(skybox, texCoords);
+	FragColor = texture(skybox, texCoords) * 0.3;
+	BrightColor = vec4(0.0);
 }

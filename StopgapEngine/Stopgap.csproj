@@ -80,11 +80,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AABB.cs" />
     <Compile Include="Assets.cs" />
     <Compile Include="Billboard.cs" />
     <Compile Include="BlurFilter.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="CamFlyController.cs" />
+    <Compile Include="Collider.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="DirectionalLight.cs" />
     <Compile Include="Game.cs" />
@@ -95,7 +97,9 @@
     <Compile Include="Gui\Graphics.cs" />
     <Compile Include="Gui\Unit.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="ObjectPool.cs" />
     <Compile Include="ParticleSystem.cs" />
+    <Compile Include="SphereCollider.cs" />
     <Compile Include="Vao_vbo_ebo.cs" />
     <Content Include="draft.txt" />
     <Content Include="Markup\markupdraft.txt" />

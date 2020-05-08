@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Stopgap.Gui;
 using Nums;
+using OpenTK.Graphics.ES11;
+using System.Collections.Specialized;
 
 namespace Stopgap.Editor {
     class Program {
@@ -59,9 +61,11 @@ namespace Stopgap.Editor {
                 });
                 icosphere.GenNormals();
 
-                for (int i = 0; i < 900; i += 3) {
+                for (int i = 0; i < 200; i += 3) {
                     var g = new GameObject();
-                    g.AddComp(new MeshRenderer(icosphere, Material.Jade));
+                    g.AddComps(new MeshRenderer(icosphere, Material.Jade), new ParticleSystem(Material.Greenglow, 20, 10) {
+                        startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * Noise.Random((int)(Game.time * 1000f) + 3) * 3f,
+                    });
                     g.transform.position = new Nums.vec3(Nums.Noise.Random(i),
                                                          Nums.Noise.Random(i + 1),
                                                          Nums.Noise.Random(i + 2)) * 500;
@@ -73,7 +77,7 @@ namespace Stopgap.Editor {
 
                 var rigidbody = new GameObject();
                 var r = new Rigidbody();
-                const float pi = (float)Math.PI;
+                
                 rigidbody.AddComps(r, new MeshRenderer(Assets.GetMesh("GalleonBoat"), Material.Greenglow));
                 rigidbody.EnterScene(Game.scene);
                 rigidbody.transform.position.y = 20;
@@ -87,7 +91,7 @@ namespace Stopgap.Editor {
                 pmesh.Subdivide(3);
                 pmesh.Mutate(v => {
                     var n = v.pos.normalized;
-                    v.pos = n + n * .1f * Noise.Random((int)(v.pos.x * 10f), (int)((v.pos.y + v.pos.z) * 10f));
+                    v.pos = n + n * .1f * math.gradnoise(v.pos * 10f);
                     return v;
                 });
                 pmesh.GenNormals();
@@ -114,6 +118,7 @@ namespace Stopgap.Editor {
                 Renderer.renderNormals = false;
                 // init editor Gui
                 
+
                 InitGUI();    
 
                 
@@ -149,24 +154,6 @@ namespace Stopgap.Editor {
                     vars[text] = g;
                 }
             };
-
-            // FPS display:
-            var fpsd = c.Create<TextBox>();
-            fpsd.font_size = 0.3f;
-            fpsd.size = unit2.parse("0.1vw 0.03vh");
-            fpsd.pos = unit2.parse("-0.5vw 0.5vh");
-            fpsd.anchor = Anchor.top_left;
-            fpsd.draw_background = false;
-            fpsd.OnUpdate += e => {
-                fpsd.SetText("FPS: " + Math.Round(Game.window.RenderFrequency));
-            };
-
-
-            // test:
-            var testel = c.Create<TextBox>();
-            testel.editable = true;
-            testel.font_size = 2;
-            testel.anchor = Anchor.bottom_right;
         }
     }
 }

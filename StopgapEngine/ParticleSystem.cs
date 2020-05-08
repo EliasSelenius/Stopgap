@@ -20,6 +20,8 @@ namespace Stopgap {
 
         public vec3 velocity;
 
+        public vec4 color;
+
         public float startTime;
         public float elapsedTime => Game.time - startTime;
     }
@@ -41,8 +43,9 @@ namespace Stopgap {
         public Func<vec2> startScale = null;
         public Func<float> startRotation = null;
         public Func<vec3> startVelocity = null;
+        public Func<vec4> startColor = null;
 
-        
+        public Func<Particle> newParticle = null;
 
         public ParticleSystem(Material material, float spawnRate, float lifetime) {
             this.material = material;
@@ -78,13 +81,16 @@ namespace Stopgap {
         }
 
         private Particle getNewParticle() {
-            return new Particle {
-                pos = gameObject.transform.position + (startPos?.Invoke() ?? vec3.zero),
-                scale = (startScale?.Invoke() ?? vec2.one),
-                rotation = (startRotation?.Invoke() ?? 0),
-                velocity = (startVelocity?.Invoke() ?? vec3.zero),
-                startTime = Game.time
-            };
+            var p = newParticle?.Invoke() ?? new Particle();
+
+            p.pos = gameObject.transform.position + (startPos?.Invoke() ?? p.pos);
+            p.scale = (startScale?.Invoke() ?? p.scale);
+            p.rotation = (startRotation?.Invoke() ?? p.rotation);
+            p.velocity = (startVelocity?.Invoke() ?? p.velocity);
+            p.color = (startColor?.Invoke() ?? p.color);
+            p.startTime = Game.time;
+
+            return p;
         }
 
 
@@ -108,6 +114,7 @@ namespace Stopgap {
 
                 m = Matrix4.CreateScale(new Vector3(particle.scale.x, particle.scale.y, 1)) * Matrix4.CreateRotationZ(particle.rotation) * m;
 
+                shader.SetVec4("tint", particle.color);
                 shader.SetMat4("obj_transform", m);
                 quad.Render();
             }
