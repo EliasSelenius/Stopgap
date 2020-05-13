@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Glow;
+using Nums;
 using OpenTK;
 
 using OpenTK.Graphics.OpenGL4;
@@ -69,8 +70,20 @@ namespace Stopgap {
 
 
             // Position:
-            program.SetVec3("cam_pos", transform.position);
+            program.set_vec3("cam_pos", transform.position);
 
+        }
+
+        public vec3 screenToRay(vec2 ndc) {
+
+            var screenPoint = new Vector4(ndc.x, ndc.y, -1, 1);
+            screenPoint = screenPoint * projection.Inverted();
+            screenPoint.Z = -1;
+            screenPoint.W = 0;
+
+            var point = (screenPoint * viewMatrix.Inverted()).Xyz;
+            point.Normalize();
+            return point.ToNumsVec();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Stopgap {
                 if (other == this) continue;
 
                 var dir = other.transform.position - transform.position;
-                rb.AddForce(dir.normalized * rb.Mass * other.rb.Mass / dir.sqlength);
+                rb.AddForce(dir.normalized() * rb.Mass * other.rb.Mass / dir.sqlength);
 
             }
         }

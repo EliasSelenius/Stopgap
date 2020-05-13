@@ -54,8 +54,8 @@ namespace Stopgap {
 
         }
 
-        public override void OnEnter() => Renderer.SetObject(gameObject.scene, Renderer.defaultShader, this);
-        public override void OnLeave() => Renderer.RemoveObject(gameObject.scene, Renderer.defaultShader, this);
+        public override void OnEnter() => Game.renderer.SetObject(gameObject.scene, Game.renderer.defaultShader, this);
+        public override void OnLeave() => Game.renderer.RemoveObject(gameObject.scene, Game.renderer.defaultShader, this);
         
         public override void Update() {
             for (int i = 0; i < particles.Count; i++) {
@@ -114,8 +114,8 @@ namespace Stopgap {
 
                 m = Matrix4.CreateScale(new Vector3(particle.scale.x, particle.scale.y, 1)) * Matrix4.CreateRotationZ(particle.rotation) * m;
 
-                shader.SetVec4("tint", particle.color);
-                shader.SetMat4("obj_transform", m);
+                shader.set_vec4("tint", particle.color);
+                shader.set_mat4("obj_transform", m);
                 quad.Render();
             }
         }

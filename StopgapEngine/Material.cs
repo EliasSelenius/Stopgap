@@ -21,18 +21,18 @@ namespace Stopgap {
         public void Apply(ShaderProgram shader) {
 
             if (diffuseTexture != null)
-                diffuseTexture?.Bind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
-            else Texture2D.Unbind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
+                diffuseTexture?.bind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
+            else Texture.unbind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
 
-            shader.SetInt("material.diffuseTexture", 0);
-            shader.SetVec3("material.diffuseColor", diffuseColor);
+            shader.set_int("material.diffuseTexture", 0);
+            shader.set_vec3("material.diffuseColor", diffuseColor);
 
-            shader.SetVec3("material.emission", emission);
+            shader.set_vec3("material.emission", emission);
 
-            shader.SetVec3("material.specular", specular);
+            shader.set_vec3("material.specular", specular);
             shader.SetFloat("material.shininess", shininess);
 
-            shader.SetVec4("tint", vec4.zero);
+            shader.set_vec4("tint", vec4.zero);
         }
 
 

@@ -12,8 +12,8 @@ namespace Stopgap.Gui {
         internal static ShaderProgram textShader;
 
         static Canvas() {
-            rectShader = ShaderProgram.CreateProgram(Shaders.ShaderResources.rectElementFragment, Shaders.ShaderResources.rectElementVertex);
-            textShader = ShaderProgram.CreateProgram(Shaders.ShaderResources.textFragment, Shaders.ShaderResources.textVertex);
+            rectShader = ShaderProgram.create(Shaders.ShaderResources.rectElementFragment, Shaders.ShaderResources.rectElementVertex);
+            textShader = ShaderProgram.create(Shaders.ShaderResources.textFragment, Shaders.ShaderResources.textVertex);
         }
 
 

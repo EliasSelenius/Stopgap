@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp.Formats.Gif;
+using Nums;
+using SixLabors.ImageSharp.Processing;
 
 namespace Stopgap {
     public class Scene {
@@ -37,10 +39,10 @@ namespace Stopgap {
         }
 
         internal void processCollisions() {
-            for (int i = 0; i < gameObjects.Count; i++) {
-                var g1 = gameObjects[i];
-                for (int j = i + 1; j < gameObjects.Count; j++) {
-                    var g2 = gameObjects[j];
+            for (int i = 0; i < _gameObjects.Count; i++) {
+                var g1 = _gameObjects[i];
+                for (int j = i + 1; j < _gameObjects.Count; j++) {
+                    var g2 = _gameObjects[j];
 
                     for (int c1 = 0; c1 < g1.colliders.Count; c1++) {
                         for (int c2 = 0; c2 < g2.colliders.Count; c2++) {
@@ -55,6 +57,17 @@ namespace Stopgap {
 
                 }
             }
+        }
+
+        public GameObject raycast(vec3 pos, vec3 dir) {
+            for (int i = 0; i < _gameObjects.Count; i++) {
+                var g = _gameObjects[i];
+                var c = g.colliders;
+                for (int j = 0; j < c.Count; j++) {
+                    if (c[j].intersectsRay(pos, dir)) return g;
+                }
+            }
+            return null;
         }
 
     }

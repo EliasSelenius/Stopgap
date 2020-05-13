@@ -41,6 +41,12 @@ namespace Stopgap {
             AngularVelocity += torque / Mass; // TODO: moment of inertia?
         }
 
-        
+        public override void OnCollision(Collider other) {
+            Console.WriteLine("COLLISION");
+
+            AddForce(other.transform.position - transform.position);
+
+        }
+
     }
 }

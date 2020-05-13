@@ -45,10 +45,10 @@ namespace Stopgap.Gui {
             vbo = new Buffer<vec4>();
             ebo = new Buffer<uint>();
 
-            vao.SetBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
-            vao.SetBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
+            vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
+            vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
 
-            vao.AttribPointer(Canvas.rectShader.GetAttribLocation("posuv"), 4, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
+            vao.attrib_pointer(Canvas.rectShader.getAttribLocation("posuv"), 4, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
 
             Game.window.KeyPress += Window_KeyPress;
@@ -152,8 +152,8 @@ namespace Stopgap.Gui {
                 addQuadData(cursor_quad, quadsCount, vertices, indices);
 
 
-            vbo.Initialize(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
-            ebo.Initialize(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
+            vbo.bufferdata(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
+            ebo.bufferdata(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
 
             //reInitCursor();
         }
@@ -213,13 +213,13 @@ namespace Stopgap.Gui {
 
         protected override void Draw() {
 
-            Canvas.textShader.Use();
+            Canvas.textShader.use();
 
-            Canvas.textShader.SetVec2("textPosition", pos_ndc);
-            Canvas.textShader.SetVec4("color", text_color);
-            font.Atlas.Bind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
-            vao.DrawElements(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, indices.Count, OpenTK.Graphics.OpenGL4.DrawElementsType.UnsignedInt);
-            Texture2D.Unbind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
+            Canvas.textShader.set_vec2("textPosition", pos_ndc);
+            Canvas.textShader.set_vec4("color", text_color);
+            font.Atlas.bind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
+            vao.draw_elements(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, indices.Count, OpenTK.Graphics.OpenGL4.DrawElementsType.UnsignedInt);
+            Texture.unbind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
         }
 
         public event Action<TextBox, OpenTK.Input.KeyboardKeyEventArgs> OnInput;

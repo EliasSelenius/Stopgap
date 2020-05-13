@@ -8,32 +8,32 @@ using Glow;
 using OpenTK.Graphics.OpenGL4;
 
 namespace Stopgap {
-    public static class Renderer {
+    public class Renderer {
 
         #region shaders
 
-        public static ShaderProgram defaultShader;
-        private readonly static ShaderProgram normalsRenderingShader;
-        private readonly static ShaderProgram imageEffectShader;
+        public ShaderProgram defaultShader;
+        private readonly ShaderProgram normalsRenderingShader;
+        private readonly ShaderProgram imageEffectShader;
 
         #endregion
 
 
         #region div props
 
-        public static bool renderNormals = false;
+        public bool renderNormals = false;
 
         #endregion
 
 
-        private static Framebuffer imageEffectFramebuffer;
-        private static Texture2D imageEffectColorbuffer;
-        private static Texture2D imageEffectBrigthnessbuffer;
-        private static Renderbuffer imageEffectDepthbuffer;
+        private Framebuffer imageEffectFramebuffer;
+        private Texture2D imageEffectColorbuffer;
+        private Texture2D imageEffectBrigthnessbuffer;
+        private Renderbuffer imageEffectDepthbuffer;
 
-        private static VertexArray imageEffectQuadVAO;
-        private static Buffer<float> imageEffectQuadVBO;
-        private static Buffer<uint> imageEffectQuadEBO;
+        private VertexArray imageEffectQuadVAO;
+        private Buffer<float> imageEffectQuadVBO;
+        private Buffer<uint> imageEffectQuadEBO;
 
         //static Texture2D testtex = new Texture2D(TestData.Images.colorfullNoise);
 
@@ -41,10 +41,10 @@ namespace Stopgap {
             void Render(ShaderProgram shader);
         }
 
-        private static readonly Dictionary<Scene, Dictionary<ShaderProgram, List<IRenderable>>> groups = new Dictionary<Scene, Dictionary<ShaderProgram, List<IRenderable>>>();
+        private readonly Dictionary<Scene, Dictionary<ShaderProgram, List<IRenderable>>> groups = new Dictionary<Scene, Dictionary<ShaderProgram, List<IRenderable>>>();
 
 
-        static Renderer() {
+        public Renderer() {
 
             //GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
@@ -57,8 +57,8 @@ namespace Stopgap {
             defaultShader = createShader(Shaders.ShaderResources.fragement, Shaders.ShaderResources.vertex);
             Assets.Shaders["default"] = defaultShader;
 
-            int camUboIndex = GL.GetUniformBlockIndex(defaultShader.Handle, "Camera");
-            GL.UniformBlockBinding(defaultShader.Handle, camUboIndex, 0);
+            int camUboIndex = GL.GetUniformBlockIndex(defaultShader.gl_handle, "Camera");
+            GL.UniformBlockBinding(defaultShader.gl_handle, camUboIndex, 0);
 
             normalsRenderingShader = createShader(Shaders.ShaderResources.normalsFragment, Shaders.ShaderResources.normalsVertex, Shaders.ShaderResources.normalGeometry);
 
@@ -66,8 +66,8 @@ namespace Stopgap {
 
             // Shader
             imageEffectShader = createShader(Shaders.ShaderResources.imageFragment, Shaders.ShaderResources.imageVertex);
-            imageEffectShader.SetInt("colorBuffer", 0);
-            imageEffectShader.SetInt("brightnessBuffer", 1);
+            imageEffectShader.set_int("colorBuffer", 0);
+            imageEffectShader.set_int("brightnessBuffer", 1);
 
             InitializeScreenQuad();
             
@@ -75,7 +75,7 @@ namespace Stopgap {
 
         }
 
-        internal static void ReinitializeImageBuffers() {
+        internal void ReinitializeImageBuffers() {
 
             if (imageEffectFramebuffer != null) {
                 imageEffectFramebuffer.Dispose();
@@ -89,48 +89,48 @@ namespace Stopgap {
 
             // depth buffer
             imageEffectDepthbuffer = new Renderbuffer(RenderbufferStorage.DepthComponent, Game.window.Width, Game.window.Height);
-            imageEffectFramebuffer.Attach(FramebufferAttachment.DepthAttachment, imageEffectDepthbuffer);
+            imageEffectFramebuffer.attach(FramebufferAttachment.DepthAttachment, imageEffectDepthbuffer);
 
             // color buffer
             imageEffectColorbuffer = new Texture2D(Game.window.Width, Game.window.Height) {
-                Filter = Filter.Linear,
-                Wrap = WrapMode.ClampToEdge
+                filter = Filter.Linear,
+                wrap = WrapMode.ClampToEdge
             };
-            imageEffectColorbuffer.Apply(false, PixelInternalFormat.Rgba16f);
-            imageEffectFramebuffer.Attach(FramebufferAttachment.ColorAttachment0, imageEffectColorbuffer);
+            imageEffectColorbuffer.apply(false, PixelInternalFormat.Rgba16f);
+            imageEffectFramebuffer.attach(FramebufferAttachment.ColorAttachment0, imageEffectColorbuffer);
 
             // brightness buffer
             imageEffectBrigthnessbuffer = new Texture2D(Game.window.Width, Game.window.Height) {
-                Filter = Filter.Linear,
-                Wrap = WrapMode.ClampToEdge
+                filter = Filter.Linear,
+                wrap = WrapMode.ClampToEdge
             };
-            imageEffectBrigthnessbuffer.Apply(false, PixelInternalFormat.Rgba16f);
-            imageEffectFramebuffer.Attach(FramebufferAttachment.ColorAttachment1, imageEffectBrigthnessbuffer);
+            imageEffectBrigthnessbuffer.apply(false, PixelInternalFormat.Rgba16f);
+            imageEffectFramebuffer.attach(FramebufferAttachment.ColorAttachment1, imageEffectBrigthnessbuffer);
             
-            imageEffectFramebuffer.Bind();
+            imageEffectFramebuffer.bind();
             GL.DrawBuffers(2, new[] { DrawBuffersEnum.ColorAttachment0, DrawBuffersEnum.ColorAttachment1 });
 
             Console.WriteLine("reinit of main framebuffer " + Game.window.Width + ", " + Game.window.Height + " status: " + GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer));
 
         }
 
-        private static void InitializeScreenQuad() {
+        private void InitializeScreenQuad() {
             imageEffectQuadVBO = new Buffer<float>();
-            imageEffectQuadVBO.Initialize(new float[] {
+            imageEffectQuadVBO.bufferdata(new float[] {
                 -1f, -1f,
                  1f, -1f,
                 -1f,  1f,
                  1f,  1f
             }, BufferUsageHint.StaticDraw);
             imageEffectQuadEBO = new Buffer<uint>();
-            imageEffectQuadEBO.Initialize(new uint[] {
+            imageEffectQuadEBO.bufferdata(new uint[] {
                 0, 1, 2,
                 3, 2, 1
             }, BufferUsageHint.StaticDraw);
             imageEffectQuadVAO = new VertexArray();
-            imageEffectQuadVAO.SetBuffer(BufferTarget.ArrayBuffer, imageEffectQuadVBO);
-            imageEffectQuadVAO.SetBuffer(BufferTarget.ElementArrayBuffer, imageEffectQuadEBO);
-            imageEffectQuadVAO.AttribPointer(0, 2, VertexAttribPointerType.Float, false, sizeof(float) * 2, 0);
+            imageEffectQuadVAO.set_buffer(BufferTarget.ArrayBuffer, imageEffectQuadVBO);
+            imageEffectQuadVAO.set_buffer(BufferTarget.ElementArrayBuffer, imageEffectQuadEBO);
+            imageEffectQuadVAO.attrib_pointer(0, 2, VertexAttribPointerType.Float, false, sizeof(float) * 2, 0);
         }
 
         private static ShaderProgram createShader(string frag, string vert, string geo = null) {
@@ -150,10 +150,10 @@ namespace Stopgap {
 
 
 
-        internal static void Render() {
+        internal void Render() {
 
             // render scene to framebuffer
-            imageEffectFramebuffer.Bind();
+            imageEffectFramebuffer.bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
             GL.Enable(EnableCap.DepthTest);
@@ -161,7 +161,7 @@ namespace Stopgap {
 
             renderScene();
 
-            Framebuffer.BindDefault(FramebufferTarget.Framebuffer);
+            Framebuffer.bind_default(FramebufferTarget.Framebuffer);
 
             GL.Disable(EnableCap.DepthTest);
 
@@ -170,32 +170,32 @@ namespace Stopgap {
             var b = BlurFilter.Blur(imageEffectBrigthnessbuffer, 10);
 
             // bind screen buffer
-            Framebuffer.BindDefault(FramebufferTarget.Framebuffer);
+            Framebuffer.bind_default(FramebufferTarget.Framebuffer);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // render image-effects
-            imageEffectShader.Use();
-            imageEffectColorbuffer.Bind(TextureUnit.Texture0);
-            b.Bind(TextureUnit.Texture1);
+            imageEffectShader.use();
+            imageEffectColorbuffer.bind(TextureUnit.Texture0);
+            b.bind(TextureUnit.Texture1);
             RenderScreenQuad();
 
-            Texture2D.Unbind(TextureUnit.Texture0);
-            Texture2D.Unbind(TextureUnit.Texture1);
+            Texture.unbind(TextureUnit.Texture0);
+            Texture.unbind(TextureUnit.Texture1);
 
 
             // gui
             Game.canvas?.Render();
         }
 
-        internal static void RenderScreenQuad() {
-            imageEffectQuadVAO.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt);
+        internal void RenderScreenQuad() {
+            imageEffectQuadVAO.draw_elements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt);
         }
 
-        private static void renderScene() {
+        private void renderScene() {
             var so = groups[Game.scene];
             foreach (var item in so) {
                 var shader = item.Key;
-                shader.Use();
+                shader.use();
 
                 shader.SetFloat("time", Game.time);
 
@@ -210,7 +210,7 @@ namespace Stopgap {
 
                 // render again with normals
                 if (renderNormals) {
-                    normalsRenderingShader.Use();
+                    normalsRenderingShader.use();
                     foreach (var obj in item.Value) {
                         obj.Render(normalsRenderingShader);
                     }
@@ -224,12 +224,12 @@ namespace Stopgap {
 
         #region rendring groups controll funcs
 
-        internal static void EnsureScene(Scene scene) {
+        internal void EnsureScene(Scene scene) {
             if (!groups.ContainsKey(scene))
                 groups.Add(scene, new Dictionary<ShaderProgram, List<IRenderable>>());
         }
 
-        internal static void SetObject(Scene scene, ShaderProgram shader, IRenderable renderable) {
+        internal void SetObject(Scene scene, ShaderProgram shader, IRenderable renderable) {
             if (!groups.ContainsKey(scene))
                 groups.Add(scene, new Dictionary<ShaderProgram, List<IRenderable>>());
             if (!groups[scene].ContainsKey(shader))
@@ -238,7 +238,7 @@ namespace Stopgap {
             groups[scene][shader].Add(renderable);
         }
 
-        internal static void RemoveObject(Scene scene, ShaderProgram shader, IRenderable renderable) {
+        internal void RemoveObject(Scene scene, ShaderProgram shader, IRenderable renderable) {
             groups[scene][shader].Remove(renderable);
         }
 

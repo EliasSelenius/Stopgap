@@ -27,11 +27,11 @@ namespace Stopgap {
         }
 
         public override void OnEnter() {
-            Renderer.SetObject(gameObject.scene, Renderer.defaultShader, this);
+            Game.renderer.SetObject(gameObject.scene, Game.renderer.defaultShader, this);
         }
 
         public override void OnLeave() {
-            Renderer.RemoveObject(gameObject.scene, Renderer.defaultShader, this);
+            Game.renderer.RemoveObject(gameObject.scene, Game.renderer.defaultShader, this);
         }
 
         public void Render(ShaderProgram shader) {
@@ -61,7 +61,7 @@ namespace Stopgap {
             m *= Matrix4.CreateScale(transform.scale.ToOpenTKVec());
             
 
-            shader.SetMat4("obj_transform", m);
+            shader.set_mat4("obj_transform", m);
             material.Apply(shader);
             quad.Render();
         }

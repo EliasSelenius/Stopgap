@@ -25,7 +25,7 @@ namespace Stopgap {
             boxvao = new VertexArray();
 
             vbo = new Buffer<float>();
-            vbo.Initialize(new float[] {
+            vbo.bufferdata(new float[] {
                 -1.0f,  1.0f, -1.0f,
                 -1.0f, -1.0f, -1.0f,
                  1.0f, -1.0f, -1.0f,
@@ -69,8 +69,8 @@ namespace Stopgap {
                  1.0f, -1.0f,  1.0f
             }, BufferUsageHint.StaticDraw);
 
-            boxvao.SetBuffer(BufferTarget.ArrayBuffer, vbo);
-            boxvao.AttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(float) * 3, 0);
+            boxvao.set_buffer(BufferTarget.ArrayBuffer, vbo);
+            boxvao.attrib_pointer(0, 3, VertexAttribPointerType.Float, false, sizeof(float) * 3, 0);
 
         }
 
@@ -79,10 +79,10 @@ namespace Stopgap {
         }
 
         internal void Render() {
-            shader.Use();
+            shader.use();
             Camera.MainCamera.UpdateCamUniforms(shader);
             onRender();
-            boxvao.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            boxvao.draw_arrays(PrimitiveType.Triangles, 0, 36);
         }
 
         protected virtual void onRender() { }
@@ -95,7 +95,7 @@ namespace Stopgap {
 
         private static ShaderProgram cubemapShader;
         static CubemapSkybox() {
-            cubemapShader = ShaderProgram.CreateProgram(Shaders.ShaderResources.skyboxFragment, Shaders.ShaderResources.skyboxVertex);
+            cubemapShader = ShaderProgram.create(Shaders.ShaderResources.skyboxFragment, Shaders.ShaderResources.skyboxVertex);
             Assets.Shaders["cubemap_skybox"] = cubemapShader;
         }
 

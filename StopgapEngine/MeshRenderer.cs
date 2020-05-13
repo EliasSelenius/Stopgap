@@ -18,7 +18,7 @@ namespace Stopgap {
 
 
 
-        public MeshRenderer(Mesh m, Material mat) : this(m, mat, Renderer.defaultShader, OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles) { }
+        public MeshRenderer(Mesh m, Material mat) : this(m, mat, Game.renderer.defaultShader, OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles) { }
 
         public MeshRenderer(Mesh m, Material mat, ShaderProgram shader) : this(m, mat, shader, OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles) { }
 
@@ -30,15 +30,15 @@ namespace Stopgap {
         }
 
         public override void OnEnter() {
-            Renderer.SetObject(gameObject.scene, shader, this);
+            Game.renderer.SetObject(gameObject.scene, shader, this);
         }
 
         public override void OnLeave() {
-            Renderer.RemoveObject(gameObject.scene, shader, this);
+            Game.renderer.RemoveObject(gameObject.scene, shader, this);
         }
 
         public void Render(ShaderProgram shader) {
-            shader.SetMat4("obj_transform", gameObject.ModelMatrix);
+            shader.set_mat4("obj_transform", gameObject.ModelMatrix);
             material.Apply(shader);
 
             mesh.Render(primitiveType);

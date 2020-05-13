@@ -100,8 +100,8 @@ namespace Stopgap.Gui {
             }*/
 
             vec2 p = pos_ndc, s = size_ndc;
-            Canvas.rectShader.SetVec4("rectTransform", p.x, p.y, s.x, s.y);
-            Canvas.rectShader.SetVec4("color", background_color);
+            Canvas.rectShader.set_vec4("rectTransform", p.x, p.y, s.x, s.y);
+            Canvas.rectShader.set_vec4("color", background_color);
         }
 
         internal void Render() {
@@ -109,7 +109,7 @@ namespace Stopgap.Gui {
             if (!Visible) return;
 
             if (draw_background) {
-                Canvas.rectShader.Use();
+                Canvas.rectShader.use();
                 ApplyUniforms();
                 Graphics.RenderRect();
             }

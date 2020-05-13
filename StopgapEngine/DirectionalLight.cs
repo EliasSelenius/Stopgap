@@ -18,11 +18,11 @@ namespace Stopgap {
         public vec3 specular = vec3.one;
 
         internal void UpdateUniforms(ShaderProgram shader) {
-            shader.SetVec3("dirLight.dir", direction);
+            shader.set_vec3("dirLight.dir", direction);
             
-            shader.SetVec3("dirLight.ambient", ambient);
-            shader.SetVec3("dirLight.diffuse", diffuse);
-            shader.SetVec3("dirLight.specular", specular);
+            shader.set_vec3("dirLight.ambient", ambient);
+            shader.set_vec3("dirLight.diffuse", diffuse);
+            shader.set_vec3("dirLight.specular", specular);
         }
 
     }

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using OpenTK.Input;
 
 using Nums;
+using System.Diagnostics;
+using System.Data.SqlTypes;
 
 namespace Stopgap {
     public static class Input {
@@ -39,15 +41,22 @@ namespace Stopgap {
         public static bool LeftMousePressed { get; private set; }
         public static bool RightMousePressed { get; private set; }
         public static bool MiddelMousePressed { get; private set; }
-       
+
+        private static readonly Dictionary<Key, bool> pressedStates = new Dictionary<Key, bool>();
+
         internal static void InitEvents() {
             Game.window.MouseMove += Window_MouseMove;
             Game.window.MouseWheel += Window_MouseWheel;
             Game.window.MouseDown += Window_MouseDown;
+
+            Game.window.KeyDown += Window_KeyDown;
+
             FixedMouse(false);
         }
 
-        
+        private static void Window_KeyDown(object sender, KeyboardKeyEventArgs e) {
+            pressedStates[e.Key] = true;
+        }
 
         private static void Window_MouseDown(object sender, MouseButtonEventArgs e) {
             switch (e.Button) {
@@ -107,6 +116,8 @@ namespace Stopgap {
             MouseWheelDelta = 0;
             LeftMousePressed = RightMousePressed = MiddelMousePressed = false;
 
+            for (int i = 0; i < pressedStates.Count; i++) pressedStates[pressedStates.ElementAt(i).Key] = false;
+
             if (IsFixedMouse) {
                 var c = screenCenter;
                 var p = Game.window.PointToScreen(new System.Drawing.Point(c.x, c.y));
@@ -114,9 +125,9 @@ namespace Stopgap {
             }
         }
 
-        public static bool IsKeyDown(Key k) {
-            return keyboard.IsKeyDown(k);
-        }
+        public static bool IsKeyDown(Key k) => keyboard.IsKeyDown(k);
+        public static bool IsKeyUp(Key k) => keyboard.IsKeyUp(k);
+        public static bool IsKeyPressed(Key k) => pressedStates.ContainsKey(k) && pressedStates[k];
 
         public static float KeyAxis(Key a, Key b) {
             var an = keyboard.IsKeyDown(a) ? 1 : 0;

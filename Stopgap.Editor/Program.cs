@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 using Stopgap.Gui;
 using Nums;
-using OpenTK.Graphics.ES11;
-using System.Collections.Specialized;
 
 namespace Stopgap.Editor {
     class Program {
@@ -30,12 +28,12 @@ namespace Stopgap.Editor {
 
                 var m = testObj.GetComponent<MeshRenderer>().mesh;
                 m.Mutate(v => {
-                    v.pos += new Nums.vec3(Nums.Noise.Random(), Nums.Noise.Random(), Nums.Noise.Random());
+                    v.pos += new Nums.vec3(math.rand(), math.rand(), math.rand());
                     return v;
                 });
                 //m.Apply();
 
-                testObj.EnterScene(Game.scene);
+                //testObj.EnterScene(Game.scene);
 
                 var quadObj = new GameObject();
                 quadObj.AddComp(new MeshRenderer(Mesh.GenQuad(), Material.Turquoise));
@@ -55,8 +53,8 @@ namespace Stopgap.Editor {
                 var icosphere = Mesh.GenIcosphere();
                 icosphere.Subdivide(2);
                 icosphere.Mutate(v => {
-                    var n = v.pos.normalized;
-                    v.pos = n + n * .1f * Noise.Random((int)(v.pos.x*10f), (int)((v.pos.y + v.pos.z)*10f));
+                    var n = v.pos.normalized();
+                    v.pos = n + n * .1f * math.rand((int)(v.pos.x*10f), (int)((v.pos.y + v.pos.z)*10f));
                     return v;
                 });
                 icosphere.GenNormals();
@@ -64,13 +62,13 @@ namespace Stopgap.Editor {
                 for (int i = 0; i < 200; i += 3) {
                     var g = new GameObject();
                     g.AddComps(new MeshRenderer(icosphere, Material.Jade), new ParticleSystem(Material.Greenglow, 20, 10) {
-                        startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * Noise.Random((int)(Game.time * 1000f) + 3) * 3f,
+                        startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * math.rand((int)(Game.time * 1000f) + 3) * 3f,
                     });
-                    g.transform.position = new Nums.vec3(Nums.Noise.Random(i),
-                                                         Nums.Noise.Random(i + 1),
-                                                         Nums.Noise.Random(i + 2)) * 500;
-                    g.AddComps(new Rigidbody { Mass = 10f, Velocity = (30, 0, 0) }, new GravitationalObject());
-                    g.transform.scale *= Noise.Random(i)*7 + 20;
+                    g.transform.position = new Nums.vec3(math.rand(i),
+                                                         math.rand(i + 1),
+                                                         math.rand(i + 2)) * 500;
+                    g.AddComps(new Rigidbody { Mass = 10f, Velocity = (30, 0, 0) }, new GravitationalObject(), new SphereCollider());
+                    g.transform.scale *= math.rand(i)*7 + 20;
                     g.EnterScene(Game.scene);
                 }
 
@@ -90,7 +88,7 @@ namespace Stopgap.Editor {
                 var pmesh = Mesh.GenIcosphere();
                 pmesh.Subdivide(3);
                 pmesh.Mutate(v => {
-                    var n = v.pos.normalized;
+                    var n = v.pos.normalized();
                     v.pos = n + n * .1f * math.gradnoise(v.pos * 10f);
                     return v;
                 });
@@ -103,19 +101,19 @@ namespace Stopgap.Editor {
 
 
                 var billboard = new GameObject();
-                billboard.AddComp(new Billboard(Material.RedPlastic));
+                billboard.AddComps(new Billboard(Material.RedPlastic), new Test());
                 billboard.EnterScene(Game.scene);
                 billboard.transform.position = (0, 40, 0);
                 billboard.transform.scale *= 3;
 
                 var ps = new GameObject();
                 ps.AddComp(new ParticleSystem(Material.Greenglow, 40, 20) { 
-                    startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * Noise.Random((int)(Game.time * 1000f) + 3) * 3f,
+                    startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * math.rand((int)(Game.time * 1000f) + 3) * 3f,
                 });
                 ps.transform.position = (-40, 20, 0);
                 ps.EnterScene(Game.scene);
 
-                Renderer.renderNormals = false;
+                Game.renderer.renderNormals = false;
                 // init editor Gui
                 
 
@@ -125,6 +123,12 @@ namespace Stopgap.Editor {
             };
 
             Game.Run();
+        }
+
+        class Test : Component {
+            public override void Update() {
+                transform.position = Camera.MainCamera.screenToRay(Input.MousePos_ndc);
+            }
         }
 
         private static void InitGUI() {

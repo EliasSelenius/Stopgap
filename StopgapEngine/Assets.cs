@@ -74,7 +74,7 @@ namespace Stopgap {
             var m = Mesh.GenIcosphere();
             m.Subdivide(2);
             m.Mutate(v => {
-                v.pos = v.pos.normalized;
+                v.pos = v.pos.normalized();
                 return v;
             });
             m.GenNormals();

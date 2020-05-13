@@ -16,7 +16,9 @@ namespace Stopgap {
         }
 
         internal override bool intersectsRay(vec3 pos, vec3 direction) {
-            throw new NotImplementedException();
+            var hypv = getWorldPos() - pos;
+            var dot = direction.dot(hypv);
+            return math.sqrt(hypv.sqlength - dot * dot) - radius < 0;
         }
 
         internal override bool intersectsSphere(SphereCollider other) {

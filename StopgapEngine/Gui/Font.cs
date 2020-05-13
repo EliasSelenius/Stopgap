@@ -92,7 +92,7 @@ namespace Stopgap.Gui {
             _next(); // skip page
             _next(); // skip chars count
 
-            var atlasSize = new vec2(Atlas.Width, Atlas.Height);
+            var atlasSize = new vec2(Atlas.width, Atlas.height);
 
             while(_next()) {
                 glyphs.Add(

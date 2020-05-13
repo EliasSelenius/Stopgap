@@ -24,6 +24,9 @@ namespace Stopgap {
 
         public static Nums.vec3 ToNumsVec(this Vector3 v) => new Nums.vec3(v.X, v.Y, v.Z);
         public static Vector3 ToOpenTKVec(this Nums.vec3 v) => new Vector3(v.x, v.y, v.z);
+        public static Nums.vec4 ToNumsVec(this Vector4 v) => new Nums.vec4(v.X, v.Y, v.Z, v.W);
+        public static Vector4 ToOpenTKVec(this Nums.vec4 v) => new Vector4(v.x, v.y, v.z, v.w);
+
 
         public static vec3 Transform(this OpenTK.Matrix4 m, vec3 a) {
             return (new Vector4(a.x, a.y, a.z, 1f) * m).Xyz.ToNumsVec();
@@ -32,9 +35,9 @@ namespace Stopgap {
         private static int seed = int.MinValue;
 
         public static vec3 RandomDirection() => RandomDirection(seed++);
-        public static vec3 RandomDirection(int seed) => new vec3(Noise.Random(seed), Noise.Random(seed + 1), Noise.Random(seed + 2)).normalized;
-        public static float RandomRange(float minmag, float maxmag) => minmag + (Noise.Random(seed++) * 0.5f + 1f) * (maxmag - minmag);
+        public static vec3 RandomDirection(int seed) => new vec3(math.rand(seed), math.rand(seed + 1), math.rand(seed + 2)).normalized();
+        public static float RandomRange(float minmag, float maxmag) => minmag + (math.rand(seed++) * 0.5f + 1f) * (maxmag - minmag);
         public static vec3 RandomVector(float minmag, float maxmag) => RandomDirection() * RandomRange(minmag, maxmag);
-        public static float Random() => Noise.Random(seed++);
+        public static float Random() => math.rand(seed++);
     }
 }

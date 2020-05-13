@@ -26,18 +26,18 @@ namespace Stopgap {
             vao = new VertexArray();
             vbo = new Buffer<T>();
             ebo = new Buffer<uint>();
-            vao.SetBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
-            vao.SetBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
+            vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
+            vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
 
         }
 
         public void Apply() {
-            vbo.Initialize(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
-            ebo.Initialize(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
+            vbo.bufferdata(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
+            ebo.bufferdata(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
         }
 
-        public void AttribPointer(int index, int size, OpenTK.Graphics.OpenGL4.VertexAttribPointerType type, bool normalized, int stride, int offset ) => vao.AttribPointer(index, size, type, normalized, stride, offset);
+        public void AttribPointer(int index, int size, OpenTK.Graphics.OpenGL4.VertexAttribPointerType type, bool normalized, int stride, int offset ) => vao.attrib_pointer(index, size, type, normalized, stride, offset);
 
-        public void Draw(OpenTK.Graphics.OpenGL4.PrimitiveType type) => vao.DrawElements(type, indices.Count, OpenTK.Graphics.OpenGL4.DrawElementsType.UnsignedInt);
+        public void Draw(OpenTK.Graphics.OpenGL4.PrimitiveType type) => vao.draw_elements(type, indices.Count, OpenTK.Graphics.OpenGL4.DrawElementsType.UnsignedInt);
     }
 }

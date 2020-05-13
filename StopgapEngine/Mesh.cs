@@ -98,24 +98,24 @@ namespace Stopgap {
             vao = new VertexArray();
 
             vbo = new Buffer<Vertex>();
-            vbo.Initialize(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
+            vbo.bufferdata(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
 
             ebo = new Buffer<uint>();
-            ebo.Initialize(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
+            ebo.bufferdata(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
 
-            vao.SetBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
-            vao.SetBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
+            vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
+            vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
 
 
-            vao.AttribPointer(0, 3, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 8, 0);
-            vao.AttribPointer(1, 2, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 3);
-            vao.AttribPointer(2, 3, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 5);
+            vao.attrib_pointer(0, 3, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 8, 0);
+            vao.attrib_pointer(1, 2, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 3);
+            vao.attrib_pointer(2, 3, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 5);
 
         }
 
         public void Apply() {
-            vbo.Initialize(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
-            ebo.Initialize(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
+            vbo.bufferdata(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
+            ebo.bufferdata(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
         }
 
 
@@ -133,7 +133,7 @@ namespace Stopgap {
 
         public void Render() => Render(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles);
         public void Render(OpenTK.Graphics.OpenGL4.PrimitiveType ptype) {
-            vao.DrawElements(ptype, indices.Count, OpenTK.Graphics.OpenGL4.DrawElementsType.UnsignedInt);
+            vao.draw_elements(ptype, indices.Count, OpenTK.Graphics.OpenGL4.DrawElementsType.UnsignedInt);
         }
 
         public void RenderNormals() {
@@ -275,7 +275,7 @@ namespace Stopgap {
 
             for (int i = 0; i < vertices.Count; i++) {
                 var v = vertices[i];
-                v.normal = v.normal.normalized;
+                v.normal = v.normal.normalized();
                 vertices[i] = v;
             }
 
@@ -398,7 +398,7 @@ namespace Stopgap {
                 for (int x = 0; x < size; x++) {
                     for (int z = 0; z < size; z++) {
 
-                        vec3 v = new vec3((float)x / (size - 1) - 0.5f, 0.5f, (float)z / (size - 1) - 0.5f).normalized;
+                        vec3 v = new vec3((float)x / (size - 1) - 0.5f, 0.5f, (float)z / (size - 1) - 0.5f).normalized();
 
                         m.AddVertex(
                             vertfunc[f](v), // pos

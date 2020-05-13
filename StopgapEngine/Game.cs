@@ -10,11 +10,13 @@ using OpenTK.Graphics.OpenGL4;
 
 using Glow;
 using Nums;
+using System.Threading;
 
 namespace Stopgap {
     public static class Game {
 
         public static readonly GameWindow window;
+        public static Renderer renderer { get; private set; }
 
         public static Scene scene { get; private set; }
         public static Gui.Canvas canvas;
@@ -23,6 +25,8 @@ namespace Stopgap {
 
         public static float deltaTime { get; private set; }
         public static float time { get; private set; }
+
+        private static Thread collisons_thread;
 
         static Game() {
             window = new GameWindow(1600, 900);
@@ -36,19 +40,23 @@ namespace Stopgap {
 
             Input.InitEvents();
 
+            collisons_thread = new Thread(() => { while (true) scene?.processCollisions(); }) { IsBackground = true };
+
         }
 
         public static void SetScene(Scene scene) {
             Game.scene = scene;
-            Renderer.EnsureScene(scene);
+            renderer.EnsureScene(scene);
         }
 
         public static void Run() {
+            collisons_thread.Start();
             window.Run();
         }
 
         private static void Window_Load(object sender, EventArgs e) {
             Assets.Load();
+            renderer = new Renderer();
             onLoad();
             CreateDebugGUI();
         }
@@ -73,14 +81,15 @@ namespace Stopgap {
             time += (deltaTime = (float)e.Time);
             
             canvas?.Update();
-            Input.Update();
             scene.Update();
+            //scene.processCollisions();
+            Input.Update();
         }
 
 
         private static void Window_RenderFrame(object sender, FrameEventArgs e) {
 
-            Renderer.Render();
+            renderer.Render();
 
             GL.Flush();
             window.SwapBuffers();
@@ -89,7 +98,7 @@ namespace Stopgap {
         private static void Window_Resize(object sender, EventArgs e) {
             GL.Viewport(0, 0, window.Width, window.Height);
             BlurFilter.ReinitializeBuffers(Game.window.Width, Game.window.Height);
-            Renderer.ReinitializeImageBuffers();
+            renderer.ReinitializeImageBuffers();
         }
     }
 }

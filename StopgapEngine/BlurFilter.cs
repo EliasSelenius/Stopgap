@@ -11,14 +11,14 @@ using OpenTK.Graphics.OpenGL4;
 namespace Stopgap {
     public static class BlurFilter {
 
-        private static ShaderProgram shader = ShaderProgram.CreateProgram(Shaders.ShaderResources.GaussianBlur, Shaders.ShaderResources.imageVertex);
+        private static ShaderProgram shader = ShaderProgram.create(Shaders.ShaderResources.GaussianBlur, Shaders.ShaderResources.imageVertex);
 
         private static Framebuffer[] fbo = new Framebuffer[2];
         private static Texture2D[] tex = new Texture2D[2];
 
         static BlurFilter() {
 
-            shader.SetInt("image", 0);
+            shader.set_int("image", 0);
 
         }
 
@@ -33,10 +33,10 @@ namespace Stopgap {
 
             Texture2D createAttachment(Framebuffer fbo) {
                 var res = new Texture2D(w, h);
-                res.Apply(false, PixelInternalFormat.Rgba16f);
-                res.Wrap = WrapMode.ClampToEdge;
-                res.Filter = Filter.Linear; // NOTE: if we dont specify filter it doesnt work
-                fbo.Attach(FramebufferAttachment.ColorAttachment0, res);
+                res.apply(false, PixelInternalFormat.Rgba16f);
+                res.wrap = WrapMode.ClampToEdge;
+                res.filter = Filter.Linear; // NOTE: if we dont specify filter it doesnt work
+                fbo.attach(FramebufferAttachment.ColorAttachment0, res);
                 return res;
             }
             
@@ -46,28 +46,28 @@ namespace Stopgap {
             tex[0] = createAttachment(fbo[0]);
             tex[1] = createAttachment(fbo[1]);
 
-            fbo[0].Bind();
+            fbo[0].bind();
             Console.WriteLine("reinit of first bloom framebuffer " + Game.window.Width + ", " + Game.window.Height + " status: " + GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer));
-            fbo[1].Bind();
+            fbo[1].bind();
             Console.WriteLine("reinit of second bloom framebuffer " + Game.window.Width + ", " + Game.window.Height + " status: " + GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer));
 
 
         }
 
         internal static Texture2D Blur(Texture2D tobeBlured, int amount) {
-            shader.Use();
+            shader.use();
             
             bool even = true;
             for (int i = 0; i < amount; i++) {
                 var bufferIndex = even ? 0 : 1;
 
-                fbo[bufferIndex].Bind();
-                shader.SetBool("horizontal", even);
+                fbo[bufferIndex].bind();
+                shader.set_bool("horizontal", even);
 
-                if (i == 0) tobeBlured.Bind(TextureUnit.Texture0);
-                else tex[even ? 1 : 0].Bind(TextureUnit.Texture0);
-                
-                Renderer.RenderScreenQuad();
+                if (i == 0) tobeBlured.bind(TextureUnit.Texture0);
+                else tex[even ? 1 : 0].bind(TextureUnit.Texture0);
+
+                Game.renderer.RenderScreenQuad();
 
                 even = !even;
             }
