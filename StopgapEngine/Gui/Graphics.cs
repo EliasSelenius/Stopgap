@@ -9,7 +9,7 @@ using Glow;
 namespace Stopgap.Gui {
     static class Graphics {
 
-        private readonly static VertexArray vao;
+        private readonly static Vertexarray vao;
         private static readonly Buffer<float> vbo;
         private static readonly Buffer<uint> ebo;
 
@@ -32,7 +32,7 @@ namespace Stopgap.Gui {
             }, OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
 
 
-            vao = new VertexArray();
+            vao = new Vertexarray();
             vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
             vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
 

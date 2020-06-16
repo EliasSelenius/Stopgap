@@ -82,6 +82,8 @@ namespace Stopgap {
 
             AddMesh("sphere", m);
 
+            AddMesh("cube", Mesh.GenCube());
+
         }
 
         private static void LoadImages() {

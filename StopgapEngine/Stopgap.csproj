@@ -47,6 +47,9 @@
     <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.1.0\lib\net20\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="Pgen">
+      <HintPath>..\..\Pgen\Pgen\bin\Debug\netstandard2.0\Pgen.dll</HintPath>
+    </Reference>
     <Reference Include="SixLabors.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SixLabors.Core.1.0.0-beta0008\lib\netstandard2.0\SixLabors.Core.dll</HintPath>
     </Reference>
@@ -81,37 +84,43 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AABB.cs" />
+    <Compile Include="AdvMesh.cs" />
     <Compile Include="Assets.cs" />
     <Compile Include="Billboard.cs" />
     <Compile Include="BlurFilter.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="CamFlyController.cs" />
+    <Compile Include="Collada.cs" />
     <Compile Include="Collider.cs" />
     <Compile Include="Component.cs" />
+    <Compile Include="DeferredRenderer.cs" />
     <Compile Include="DirectionalLight.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="GravitationalObject.cs" />
     <Compile Include="Gui\Canvas.cs" />
+    <Compile Include="Gui\CanvasComponent.cs" />
     <Compile Include="Gui\Element.cs" />
     <Compile Include="Gui\Graphics.cs" />
     <Compile Include="Gui\Unit.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="ObjectPool.cs" />
     <Compile Include="ParticleSystem.cs" />
+    <Compile Include="Renderer.cs" />
+    <Compile Include="Script\ScriptParser.cs" />
     <Compile Include="SphereCollider.cs" />
     <Compile Include="Vao_vbo_ebo.cs" />
     <Content Include="draft.txt" />
     <Content Include="Markup\markupdraft.txt" />
     <Compile Include="Markup\Tokenizer.cs" />
-    <Compile Include="Material.cs" />
+    <Compile Include="PBRMaterial.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="MeshRenderer.cs" />
     <Compile Include="MyMath.cs" />
     <Compile Include="OBJ.cs" />
     <Compile Include="Prefab.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Renderer.cs" />
+    <Compile Include="DefaultRenderer.cs" />
     <Compile Include="Rigidbody.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="Shaders\ShaderResources.Designer.cs">
@@ -133,6 +142,7 @@
     </Compile>
     <Compile Include="Gui\TextBox.cs" />
     <Compile Include="Transform.cs" />
+    <Content Include="Script\scriptdraft.txt" />
     <Content Include="TestData\colorfullNoise.png" />
     <Content Include="Gui\arial.png" />
   </ItemGroup>
@@ -144,6 +154,7 @@
     <None Include="Shaders\debug\normalsFragment.glsl" />
     <None Include="Shaders\debug\normalsVertex.glsl" />
     <None Include="Shaders\fragement.glsl" />
+    <None Include="Shaders\gBufferFrag.glsl" />
     <None Include="Shaders\Gui\rectElementFragment.glsl" />
     <None Include="Shaders\Gui\rectElementVertex.glsl" />
     <None Include="Shaders\Gui\textFragment.glsl" />
@@ -151,6 +162,8 @@
     <None Include="Shaders\imageEffects\GaussianBlur.glsl" />
     <None Include="Shaders\imageFragment.glsl" />
     <None Include="Shaders\imageVertex.glsl" />
+    <None Include="Shaders\lightPassFrag.glsl" />
+    <None Include="Shaders\PBRfrag.glsl" />
     <None Include="Shaders\skyboxFragment.glsl" />
     <None Include="Shaders\skyboxVertex.glsl" />
     <None Include="Shaders\vertex.glsl" />

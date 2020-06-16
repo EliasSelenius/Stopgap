@@ -26,15 +26,17 @@ namespace Stopgap {
         public float elapsedTime => Game.time - startTime;
     }
 
-    public class ParticleSystem : Component, Renderer.IRenderable {
+    public class ParticleSystem : Component, IRenderable {
 
         private static readonly Mesh quad;
+        private static readonly ShaderProgram program;
 
         static ParticleSystem() {
             quad = Mesh.GenQuad(); quad.Init();
+            program = Assets.Shaders["default"];
         }
 
-        public Material material;
+        public IMaterial material;
         private readonly List<Particle> particles = new List<Particle>();
         public float spawnRate;
         public float lifetime;
@@ -47,17 +49,17 @@ namespace Stopgap {
 
         public Func<Particle> newParticle = null;
 
-        public ParticleSystem(Material material, float spawnRate, float lifetime) {
+        public ParticleSystem(IMaterial material, float spawnRate, float lifetime) {
             this.material = material;
             this.spawnRate = spawnRate;
             this.lifetime = lifetime;
 
         }
 
-        public override void OnEnter() => Game.renderer.SetObject(gameObject.scene, Game.renderer.defaultShader, this);
-        public override void OnLeave() => Game.renderer.RemoveObject(gameObject.scene, Game.renderer.defaultShader, this);
-        
-        public override void Update() {
+        protected override void OnEnter() => Game.renderer.SetObject(gameObject.scene, program, this);
+        protected override void OnLeave() => Game.renderer.RemoveObject(gameObject.scene, program, this);
+
+        protected override void Update() {
             for (int i = 0; i < particles.Count; i++) {
                 var p = particles[i];
                 p.pos += p.velocity * Game.deltaTime;

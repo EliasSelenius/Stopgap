@@ -15,14 +15,14 @@ using SixLabors.ImageSharp.PixelFormats;
 namespace Stopgap {
     public class Skybox {
 
-        private static VertexArray boxvao;
+        private static Vertexarray boxvao;
         private static Buffer<float> vbo;
 
         public readonly ShaderProgram shader;
 
         static Skybox() {
 
-            boxvao = new VertexArray();
+            boxvao = new Vertexarray();
 
             vbo = new Buffer<float>();
             vbo.bufferdata(new float[] {

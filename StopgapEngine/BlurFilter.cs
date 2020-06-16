@@ -19,7 +19,7 @@ namespace Stopgap {
         static BlurFilter() {
 
             shader.set_int("image", 0);
-
+            ReinitializeBuffers(Game.window.Width, Game.window.Height);
         }
 
         internal static void ReinitializeBuffers(int w, int h) {
@@ -33,7 +33,8 @@ namespace Stopgap {
 
             Texture2D createAttachment(Framebuffer fbo) {
                 var res = new Texture2D(w, h);
-                res.apply(false, PixelInternalFormat.Rgba16f);
+                res.internal_format = PixelInternalFormat.Rgba16f;
+                res.apply(genMipMap:false);
                 res.wrap = WrapMode.ClampToEdge;
                 res.filter = Filter.Linear; // NOTE: if we dont specify filter it doesnt work
                 fbo.attach(FramebufferAttachment.ColorAttachment0, res);
@@ -54,6 +55,11 @@ namespace Stopgap {
 
         }
 
+        internal static void resize() {
+            fbo[0].resize(Game.window.Width, Game.window.Height);
+            fbo[1].resize(Game.window.Width, Game.window.Height);
+        }
+
         internal static Texture2D Blur(Texture2D tobeBlured, int amount) {
             shader.use();
             
@@ -67,7 +73,7 @@ namespace Stopgap {
                 if (i == 0) tobeBlured.bind(TextureUnit.Texture0);
                 else tex[even ? 1 : 0].bind(TextureUnit.Texture0);
 
-                Game.renderer.RenderScreenQuad();
+                Renderer.RenderScreenQuad();
 
                 even = !even;
             }

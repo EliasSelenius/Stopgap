@@ -115,7 +115,7 @@ namespace Stopgap {
                 return Assets.GetMesh(str);
             } else if (str.StartsWith("material(")) {
                 str = str.Substring(9, str.Length - 10);
-                return typeof(Material).GetProperty(str).GetValue(null);
+                return typeof(BlinnPhongMaterial).GetProperty(str).GetValue(null);
             }
 
             return null;

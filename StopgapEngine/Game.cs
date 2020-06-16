@@ -26,11 +26,11 @@ namespace Stopgap {
         public static float deltaTime { get; private set; }
         public static float time { get; private set; }
 
-        private static Thread collisons_thread;
+        internal static Thread collisons_thread;
 
         static Game() {
             window = new GameWindow(1600, 900);
-
+            window.VSync = VSyncMode.Off;
             //window.WindowState = WindowState.Fullscreen;
 
             window.Resize += Window_Resize;
@@ -50,20 +50,24 @@ namespace Stopgap {
         }
 
         public static void Run() {
-            collisons_thread.Start();
             window.Run();
         }
 
         private static void Window_Load(object sender, EventArgs e) {
             Assets.Load();
-            renderer = new Renderer();
+            
+            
+            renderer = new DefaultRenderer();
+            //renderer = new DeferredRenderer();
             onLoad();
             CreateDebugGUI();
+            
+            //collisons_thread.Start();
         }
 
         private static void CreateDebugGUI() {
 
-            var c = Game.canvas ??= new Gui.Canvas();
+            var c = Game.canvas ??= new Gui.Canvas(window.Width, window.Height);
 
             // FPS display:
             var fpsd = c.Create<Gui.TextBox>();
@@ -97,8 +101,10 @@ namespace Stopgap {
 
         private static void Window_Resize(object sender, EventArgs e) {
             GL.Viewport(0, 0, window.Width, window.Height);
-            BlurFilter.ReinitializeBuffers(Game.window.Width, Game.window.Height);
-            renderer.ReinitializeImageBuffers();
+            //BlurFilter.ReinitializeBuffers(Game.window.Width, Game.window.Height);
+            BlurFilter.resize();
+            renderer.OnWindowResize(window.Width, window.Height);
+            canvas.resize(window.Width, window.Height);
         }
     }
 }

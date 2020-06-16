@@ -1,37 +1,40 @@
 ﻿using Glow;
 using Nums;
 using OpenTK;
-
+using OpenTK.Graphics.ES11;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Stopgap {
-    public class Billboard : Component, Renderer.IRenderable {
+    public class Billboard : Component, IRenderable {
 
         private static readonly Mesh quad;
+        private static readonly ShaderProgram program;
 
         static Billboard() {
             quad = Mesh.GenQuad(); quad.Init();
+            program = Assets.Shaders["default"];
         }
 
 
-        public Material material;
+        public IMaterial material;
         
-        public Billboard(Material material) {
+        public Billboard(IMaterial material) {
             this.material = material;
         }
 
-        public override void OnEnter() {
-            Game.renderer.SetObject(gameObject.scene, Game.renderer.defaultShader, this);
+        protected override void OnEnter() {
+            Game.renderer.SetObject(gameObject.scene, program, this);
         }
 
-        public override void OnLeave() {
-            Game.renderer.RemoveObject(gameObject.scene, Game.renderer.defaultShader, this);
+        protected override void OnLeave() {
+            Game.renderer.RemoveObject(gameObject.scene, program, this);
         }
 
         public void Render(ShaderProgram shader) {

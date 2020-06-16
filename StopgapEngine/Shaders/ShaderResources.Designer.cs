@@ -144,6 +144,33 @@ namespace Stopgap.Shaders {
         /// <summary>
         ///   Looks up a localized string similar to #version 330 core
         ///
+        ///layout(location = 0) out vec3 gPosition;
+        ///layout(location = 1) out vec3 gNormal;
+        ///layout(location = 2) out vec4 gAlbedoSpec;
+        ///
+        ///in VS_OUT {
+        ///	vec2 uv;
+        ///	vec3 normal;
+        ///	vec3 fragPos;
+        ///};
+        ///
+        ///
+        ///void main() {
+        ///	gPosition = fragPos;
+        ///	gNormal = normal; // normalize?
+        ///	gAlbedoSpec.rgb = vec3(1.0);
+        ///	gAlbedoSpec.a = 1.0;
+        ///}.
+        /// </summary>
+        internal static string gBufferFrag {
+            get {
+                return ResourceManager.GetString("gBufferFrag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #version 330 core
+        ///
         ///uniform sampler2D colorBuffer;
         ///uniform sampler2D brightnessBuffer;
         ///uniform float exposure = 1.0;
@@ -189,6 +216,36 @@ namespace Stopgap.Shaders {
         internal static string imageVertex {
             get {
                 return ResourceManager.GetString("imageVertex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #version 330 core
+        ///out vec4 FragColor;
+        ///  
+        ///in vec2 uv;
+        ///
+        ///
+        ///uniform sampler2D gPosition;
+        ///uniform sampler2D gNormal;
+        ///uniform sampler2D gAlbedoSpec;
+        ///
+        ///
+        ///void main()
+        ///{             
+        ///    /*
+        ///    // retrieve data from G-buffer
+        ///    vec3 FragPos = texture(gPosition, TexCoords).rgb;
+        ///    vec3 Normal = texture(gNormal, TexCoords).rgb;
+        ///    vec3 Albedo = texture(gAlbedoSpec, TexCoords).rgb;
+        ///    float Specular = texture(gAlbedoSpec, TexCoords).a;
+        ///    
+        ///    // then calculate lighting as usual
+        ///    vec3 lighting [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string lightPassFrag {
+            get {
+                return ResourceManager.GetString("lightPassFrag", resourceCulture);
             }
         }
         
@@ -272,6 +329,43 @@ namespace Stopgap.Shaders {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to #version 330 core
+        ///
+        ///out vec4 FragColor;
+        ///
+        ///
+        ///in VS_OUT {
+        ///	vec2 uv;
+        ///	vec3 normal;
+        ///	vec3 fragPos;
+        ///} vInput;
+        ///
+        ///
+        ///
+        ///// material parameters
+        ///uniform vec3  albedo;
+        ///uniform float metallic;
+        ///uniform float roughness;
+        ///
+        ///
+        ///uniform vec3 cam_pos;
+        ///
+        ///const float PI = 3.14159265359;
+        ///  
+        ///float DistributionGGX(vec3 N, vec3 H, float roughness);
+        ///float GeometrySchlickGGX(float NdotV, float roughness);
+        ///float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
+        ///vec3 fresnelSchlick(float cosTheta, vec3 F0);
+        ///
+        ///vec3 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string PBRfrag {
+            get {
+                return ResourceManager.GetString("PBRfrag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to #version 440 core
         ///
         ///uniform sampler2D font_atlas;
@@ -334,9 +428,12 @@ namespace Stopgap.Shaders {
         ///
         ///in vec3 texCoords;
         ///
-        ///out vec4 color;
+        ///layout (location = 0) out vec4 FragColor;
+        ///layout (location = 1) out vec4 BrightColor;
+        ///
         ///void main() {
-        ///	color = texture(skybox, texCoords);
+        ///	FragColor = texture(skybox, texCoords) * 0.3;
+        ///	BrightColor = vec4(0.0);
         ///}.
         /// </summary>
         internal static string skyboxFragment {
@@ -400,7 +497,7 @@ namespace Stopgap.Shaders {
         ///   Looks up a localized string similar to #version 440 core
         ///
         ///// vec2 position, vec2 size
-        ///uniform vec4 rectTransform;
+        ///uniform vec2 textPosition;
         ///
         ///layout (location = 0) in vec4 posuv;
         ///
@@ -410,7 +507,7 @@ namespace Stopgap.Shaders {
         ///	
         ///	vec2 vp = posuv.xy;
         ///
-        ///	vec2 pos = rectTransform.xy + vp * rectTransform.zw;
+        ///	vec2 pos = textPosition + vp;
         ///
         ///	gl_Position = vec4(pos, 0.0, 1.0);
         ///	uv = posuv.zw;

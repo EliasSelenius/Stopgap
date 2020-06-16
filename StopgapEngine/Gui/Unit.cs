@@ -40,7 +40,7 @@ namespace Stopgap.Gui {
         public float get_ndc(Element element, bool vertical) {
             return type switch {
                 UnitType.ndc => value,
-                UnitType.pixels => value / (vertical ? Game.window.Height : Game.window.Width) * 2 - 1,
+                UnitType.pixels => value / (vertical ? element.canvas.height : element.canvas.width) * 2 - 1,
                 UnitType.viewHeight => (value * 2) * (vertical ? 1 : element.canvas.aspectRatio),
                 UnitType.viewWidth => (value * 2) / (vertical ? element.canvas.aspectRatio : 1),
                 _ => throw new Exception("")

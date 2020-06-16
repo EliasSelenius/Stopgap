@@ -124,11 +124,17 @@
   <data name="GaussianBlur" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>imageEffects\GaussianBlur.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="gBufferFrag" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>gBufferFrag.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="imageFragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>imageFragment.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="imageVertex" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>imageVertex.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="lightPassFrag" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>lightPassFrag.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="normalGeometry" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>debug\normalGeometry.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
@@ -138,6 +144,9 @@
   </data>
   <data name="normalsVertex" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>debug\normalsVertex.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="PBRfrag" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>PBRfrag.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="rectElementFragment" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Gui\rectElementFragment.glsl;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>

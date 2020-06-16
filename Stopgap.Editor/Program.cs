@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Stopgap.Gui;
 using Nums;
+using OpenTK;
+using System.Diagnostics.PerformanceData;
 
 namespace Stopgap.Editor {
     class Program {
@@ -16,6 +18,14 @@ namespace Stopgap.Editor {
                 
                 Game.SetScene(new Scene());
 
+
+                // test collada import:
+                var xml = new System.Xml.XmlDocument();
+                xml.Load("data/models/Ships2.dae");
+                //var collada = new Collada(xml);
+                //collada.ToGameObject();
+
+
                 var user = new GameObject();
                 user.AddComps(
                     new Camera(),
@@ -24,7 +34,7 @@ namespace Stopgap.Editor {
 
                 var testObj = new GameObject();
                 testObj.AddComps(
-                    new MeshRenderer(Assets.GetMesh("SpaceShip"), Material.Chrome));
+                    new MeshRenderer(Assets.GetMesh("SpaceShip"), BlinnPhongMaterial.Chrome));
 
                 var m = testObj.GetComponent<MeshRenderer>().mesh;
                 m.Mutate(v => {
@@ -36,7 +46,7 @@ namespace Stopgap.Editor {
                 //testObj.EnterScene(Game.scene);
 
                 var quadObj = new GameObject();
-                quadObj.AddComp(new MeshRenderer(Mesh.GenQuad(), Material.Turquoise));
+                quadObj.AddComp(new MeshRenderer(Mesh.GenQuad(), BlinnPhongMaterial.Turquoise));
                 //quadObj.EnterScene(Game.scene);
                 quadObj.transform.scale = (1000, 1000, 1000);
                 quadObj.transform.Rotate((-(float)Math.PI / 2f, 0f, 0f));
@@ -44,7 +54,7 @@ namespace Stopgap.Editor {
                 var galleon = new GameObject();
                 galleon.transform.position = (80, 0, 0);
                 galleon.transform.scale = (2, 2, 2);
-                galleon.AddComp(new MeshRenderer(Assets.GetMesh("GalleonBoat"), Material.Ruby));
+                galleon.AddComp(new MeshRenderer(Assets.GetMesh("GalleonBoat"), BlinnPhongMaterial.Ruby));
                 galleon.EnterScene(Game.scene);
 
 
@@ -59,9 +69,14 @@ namespace Stopgap.Editor {
                 });
                 icosphere.GenNormals();
 
+
                 for (int i = 0; i < 200; i += 3) {
                     var g = new GameObject();
-                    g.AddComps(new MeshRenderer(icosphere, Material.Jade), new ParticleSystem(Material.Greenglow, 20, 10) {
+                    g.AddComps(new MeshRenderer(icosphere, new PBRMaterial { 
+                        albedo = vec3.one * .8f,
+                        metallic = math.range(0, 1),
+                        roughness = math.range(0, 1)
+                    }), new ParticleSystem(BlinnPhongMaterial.Greenglow, 20, 10) {
                         startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * math.rand((int)(Game.time * 1000f) + 3) * 3f,
                     });
                     g.transform.position = new Nums.vec3(math.rand(i),
@@ -73,11 +88,28 @@ namespace Stopgap.Editor {
                 }
 
 
+                {
+                    const int count = 10;
+                    for (int x = 1; x <= count; x++) {
+                        for (int y = 1; y <= count; y++) {
+                            var g = new GameObject(new MeshRenderer(Assets.GetMesh("sphere"), new PBRMaterial {
+                                albedo = (1, 1, 1),
+                                metallic = (float)x / count,
+                                roughness = (float)y / count
+                            }));
+                            g.transform.position += (x, y, 0f);
+                            g.transform.position *= 2f;
+                            g.EnterScene(Game.scene);
+                        }
+                    }
+                }
+
+
                 var rigidbody = new GameObject();
                 var r = new Rigidbody();
                 
-                rigidbody.AddComps(r, new MeshRenderer(Assets.GetMesh("GalleonBoat"), Material.Greenglow));
-                rigidbody.EnterScene(Game.scene);
+                rigidbody.AddComps(r, new MeshRenderer(Assets.GetMesh("GalleonBoat"), BlinnPhongMaterial.Greenglow));
+                //rigidbody.EnterScene(Game.scene);
                 rigidbody.transform.position.y = 20;
 
                 r.AddForce(vec3.unitx, vec3.one);
@@ -93,7 +125,7 @@ namespace Stopgap.Editor {
                     return v;
                 });
                 pmesh.GenNormals();
-                planet.AddComps(new MeshRenderer(pmesh, Material.Silver), new Rigidbody { Mass = 10000f }, new GravitationalObject());
+                planet.AddComps(new MeshRenderer(pmesh, BlinnPhongMaterial.Silver), new Rigidbody { Mass = 10000f }, new GravitationalObject());
                 planet.EnterScene(Game.scene);
                 planet.transform.position = (0, 0, 700);
                 planet.transform.scale *= 100;
@@ -101,19 +133,19 @@ namespace Stopgap.Editor {
 
 
                 var billboard = new GameObject();
-                billboard.AddComps(new Billboard(Material.RedPlastic), new Test());
+                billboard.AddComps(new Billboard(BlinnPhongMaterial.RedPlastic), new Test());
                 billboard.EnterScene(Game.scene);
                 billboard.transform.position = (0, 40, 0);
                 billboard.transform.scale *= 3;
 
                 var ps = new GameObject();
-                ps.AddComp(new ParticleSystem(Material.Greenglow, 40, 20) { 
+                ps.AddComp(new ParticleSystem(BlinnPhongMaterial.Greenglow, 40, 20) { 
                     startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * math.rand((int)(Game.time * 1000f) + 3) * 3f,
                 });
                 ps.transform.position = (-40, 20, 0);
                 ps.EnterScene(Game.scene);
 
-                Game.renderer.renderNormals = false;
+                //Game.renderer.renderNormals = false;
                 // init editor Gui
                 
 
@@ -126,13 +158,13 @@ namespace Stopgap.Editor {
         }
 
         class Test : Component {
-            public override void Update() {
+            protected override void Update() {
                 transform.position = Camera.MainCamera.screenToRay(Input.MousePos_ndc);
             }
         }
 
         private static void InitGUI() {
-            var c = Game.canvas = new Gui.Canvas();
+            var c = Game.canvas = new Gui.Canvas(Game.window.Width, Game.window.Height);
 
             /*var test = c.Create<TextBox>();
             test.editable = true;
@@ -153,7 +185,7 @@ namespace Stopgap.Editor {
                     t.RemoveText(0, text.Length);
                     Console.WriteLine(text);
                     var g = new GameObject();
-                    g.AddComps(new MeshRenderer(Assets.GetMesh("sphere"), Material.Default));
+                    g.AddComps(new MeshRenderer(Assets.GetMesh("sphere"), BlinnPhongMaterial.Default));
                     g.EnterScene(Game.scene);
                     vars[text] = g;
                 }

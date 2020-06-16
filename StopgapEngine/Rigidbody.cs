@@ -18,7 +18,7 @@ namespace Stopgap {
 
         public vec3 Momentum => Velocity * Mass;
 
-        public override void Update() {
+        protected override void Update() {
             transform.position += Velocity * Game.deltaTime;
             transform.Rotate(AngularVelocity * Game.deltaTime);
             

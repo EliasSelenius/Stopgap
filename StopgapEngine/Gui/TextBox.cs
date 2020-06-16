@@ -22,7 +22,7 @@ namespace Stopgap.Gui {
         public string text { get; private set; } = "";
         private readonly List<Quad> quads = new List<Quad>();
 
-        private VertexArray vao;
+        private Vertexarray vao;
         private Buffer<vec4> vbo;
         private Buffer<uint> ebo;
 
@@ -40,7 +40,7 @@ namespace Stopgap.Gui {
 
         public TextBox() {
 
-            vao = new VertexArray();
+            vao = new Vertexarray();
 
             vbo = new Buffer<vec4>();
             ebo = new Buffer<uint>();
@@ -48,7 +48,7 @@ namespace Stopgap.Gui {
             vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
             vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
 
-            vao.attrib_pointer(Canvas.rectShader.getAttribLocation("posuv"), 4, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
+            vao.attrib_pointer(Canvas.rectShader.get_attrib_location("posuv"), 4, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
 
             Game.window.KeyPress += Window_KeyPress;

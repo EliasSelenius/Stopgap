@@ -13,7 +13,7 @@ namespace Stopgap {
             //Input.FixedMouse(true);
         }
 
-        public override void Update() {
+        protected override void Update() {
 
 
             if (Input.MouseRightButtonDown) {

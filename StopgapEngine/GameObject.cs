@@ -22,11 +22,11 @@ namespace Stopgap {
         public bool IsParent => _children.Count > 0;
         public bool IsChild => parent != null;
 
-        public Matrix4 ModelMatrix {
+        public Matrix4 model_matrix {
             get {
                 var m = transform.matrix;
                 if (parent != null) {
-                    return m * parent.ModelMatrix;
+                    return m * parent.model_matrix;
                 }
                 return m;
             }
@@ -58,9 +58,9 @@ namespace Stopgap {
         }
 
         public void AddChild(GameObject obj) {
-            if (obj.scene != scene) {
-                obj.EnterScene(scene);
-            }
+            // make sure the child object is in the same scene as the parent
+            if (obj.scene != scene) obj.EnterScene(scene);
+            
             _children.Add(obj);
             obj.parent = this;
         }
@@ -71,9 +71,9 @@ namespace Stopgap {
         }
 
         public void AddComp(Component c) {
-            if (c.gameObject != null)
-                throw new Exception("Component is already attached to a object");
+            if (c.gameObject != null) throw new Exception("Component is already attached to a object");
 
+            // keep track of 'offten used' components
             if (c is Rigidbody r) rigidbody = r;
             else if (c is Collider col) _colliders.Add(col);
 
@@ -81,7 +81,7 @@ namespace Stopgap {
             c.Init(this);
             if (HasStarted) { 
                 c.Start();
-                if (scene != null) c.OnEnter();
+                if (scene != null) c.Enter();
             }
         }
 
@@ -93,52 +93,51 @@ namespace Stopgap {
 
         public bool HasStarted { get; private set; } = false;
         internal void Start() {
-            for (int i = 0; i < components.Count; i++) {
-                components[i].Start();
-            }
+            for (int i = 0; i < components.Count; i++) components[i].Start();
             HasStarted = true;
         }
 
-        internal void Update() {
-            for (int i = 0; i < _components.Count; i++)
-                _components[i].Update();
-        }
 
         public void EnterScene(Scene s) {
+            // if we already are inside the scene
+            if (scene == s) return;
 
-            if (!HasStarted)
-                this.Start();
-            
-            for (int i = 0; i < _children.Count; i++) {
-                _children[i].EnterScene(s);
-            }
-
-            if (scene != null) {
-                LeaveScene();
-            }
-
+            // make sure gameobject has 'started'
+            if (!HasStarted) this.Start();
+            // allow chilldren to enter first
+            for (int i = 0; i < _children.Count; i++) _children[i].EnterScene(s);
+            // leave current scene before entering the new one
+            if (scene != null) LeaveScene();
+            // enter scene
             scene = s;
             scene._AddObject(this);
-            for (int i = 0; i < _components.Count; i++) {
-                _components[i].OnEnter();
-            }
+            // notify components that we have entered a scene
+            for (int i = 0; i < _components.Count; i++) _components[i].Enter();
+            
         }
 
         public void LeaveScene() {
-            for (int i = 0; i < children.Count; i++) {
-                _children[i].LeaveScene();
-            }
-            for (int i = 0; i < _components.Count; i++) {
-                _components[i].OnLeave();
-            }
+            if (scene == null) return;
+            for (int i = 0; i < children.Count; i++) _children[i].LeaveScene();
+            for (int i = 0; i < _components.Count; i++) _components[i].Leave();
             scene._RemoveObject(this);
             scene = null;
         }
 
         internal void OnCollision(Collider other) {
-            for (int i = 0; i < _components.Count; i++) {
-                _components[i].OnCollision(other);
-            }
+            for (int i = 0; i < _components.Count; i++) _components[i].OnCollision(other);
+        }
+
+        public void Destroy() {
+            parent?.RemoveChild(this);
+            for (int i = 0; i < _children.Count; i++) _children[i].Destroy();
+            for (int i = 0; i < _components.Count; i++) _components[i].Destroy();
+            if (scene != null) LeaveScene();
+            
+            _children.Clear();
+            _components.Clear();
+            _colliders.Clear();
+            rigidbody = null;
         }
     }
 }

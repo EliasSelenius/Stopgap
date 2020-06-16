@@ -16,18 +16,18 @@ namespace Stopgap {
             rb = gameObject.GetComponent<Rigidbody>();
         }
 
-        public override void OnEnter() {
+        protected override void OnEnter() {
             if (!otherObjects.ContainsKey(gameObject.scene))
                 otherObjects[gameObject.scene] = new List<GravitationalObject>();
 
             otherObjects[gameObject.scene].Add(this);
         }
 
-        public override void OnLeave() {
+        protected override void OnLeave() {
             otherObjects[gameObject.scene].Remove(this);
         }
 
-        public override void Update() {
+        protected override void Update() {
             var objs = otherObjects[gameObject.scene];
             for (int i = 0; i < objs.Count; i++) {
                 var other = objs[i];

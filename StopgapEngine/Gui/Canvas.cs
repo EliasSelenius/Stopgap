@@ -17,10 +17,22 @@ namespace Stopgap.Gui {
         }
 
 
+
+        public int width { get; private set; }
+        public int height { get; private set; }
+        public void resize(int w, int h) {
+            width = w; height = h;
+        }
+
         public Element focusedElement { get; internal set; } = null;
-        public float aspectRatio => (float)Game.window.Height / Game.window.Width;
+        public float aspectRatio => (float)height / width;
 
         private readonly List<Element> rootElements = new List<Element>();
+        
+        public Canvas(int w, int h) {
+            width = w;
+            height = h;
+        }
 
         public T Create<T>() where T : Element, new() {
             var e = Element.Create<T>(this);

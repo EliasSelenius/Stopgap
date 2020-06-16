@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 using Nums;
 using Glow;
-
+using System.Security.Permissions;
 
 namespace Stopgap {
     [StructLayout(LayoutKind.Sequential)]
@@ -28,7 +28,7 @@ namespace Stopgap {
 
     public class Mesh {
 
-        private VertexArray vao;
+        private Vertexarray vao;
         private Buffer<Vertex> vbo;
         private Buffer<uint> ebo;
 
@@ -95,7 +95,7 @@ namespace Stopgap {
                 return;
             }
 
-            vao = new VertexArray();
+            vao = new Vertexarray();
 
             vbo = new Buffer<Vertex>();
             vbo.bufferdata(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
@@ -106,14 +106,21 @@ namespace Stopgap {
             vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
             vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ElementArrayBuffer, ebo);
 
-
+            /*
             vao.attrib_pointer(0, 3, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 8, 0);
             vao.attrib_pointer(1, 2, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 3);
             vao.attrib_pointer(2, 3, OpenTK.Graphics.OpenGL4.VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 5);
-
+            */
+            const int stride = sizeof(float) * 8;
+            vao.attrib_pointer(0, AttribType.Vec3, stride, 0);
+            vao.attrib_pointer(1, AttribType.Vec2, stride, sizeof(float) * 3);
+            vao.attrib_pointer(2, AttribType.Vec3, stride, sizeof(float) * 5);
         }
 
         public void Apply() {
+
+            if (!IsInitialized) this.Init();
+
             vbo.bufferdata(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
             ebo.bufferdata(indices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
         }
@@ -331,7 +338,66 @@ namespace Stopgap {
         }
 
         public static Mesh GenCube() {
-            return new Mesh();
+            const float k = 0.5f;
+            const float n = -k;
+            var verts = new Vertex[] {
+                // front side
+                new Vertex(new vec3(n,n,n), new vec2(), new vec3()),
+                new Vertex(new vec3(k,n,n), new vec2(), new vec3()),
+                new Vertex(new vec3(n,k,n), new vec2(), new vec3()),
+                new Vertex(new vec3(k,k,n), new vec2(), new vec3()),
+
+                // back side
+                new Vertex(new vec3(n,n,k), new vec2(), new vec3()),
+                new Vertex(new vec3(k,n,k), new vec2(), new vec3()),
+                new Vertex(new vec3(n,k,k), new vec2(), new vec3()),
+                new Vertex(new vec3(k,k,k), new vec2(), new vec3()),
+
+                // right side
+                new Vertex(new vec3(n,n,n), new vec2(), new vec3()),
+                new Vertex(new vec3(n,k,n), new vec2(), new vec3()),
+                new Vertex(new vec3(n,n,k), new vec2(), new vec3()),
+                new Vertex(new vec3(n,k,k), new vec2(), new vec3()),
+
+                // left side
+                new Vertex(new vec3(k,n,n), new vec2(), new vec3()),
+                new Vertex(new vec3(k,n,k), new vec2(), new vec3()),
+                new Vertex(new vec3(k,k,n), new vec2(), new vec3()),
+                new Vertex(new vec3(k,k,k), new vec2(), new vec3()),
+
+                // top side
+                new Vertex(new vec3(n,k,n), new vec2(), new vec3()),
+                new Vertex(new vec3(k,k,n), new vec2(), new vec3()),
+                new Vertex(new vec3(k,k,k), new vec2(), new vec3()),
+                new Vertex(new vec3(n,k,k), new vec2(), new vec3()),
+
+                // bottom side
+                new Vertex(new vec3(n,n,n), new vec2(), new vec3()),
+                new Vertex(new vec3(k,n,n), new vec2(), new vec3()),
+                new Vertex(new vec3(k,n,k), new vec2(), new vec3()),
+                new Vertex(new vec3(n,n,k), new vec2(), new vec3()),
+
+            };
+            var ind = new uint[] {
+                /*0,1,2,     2,1,3,    // front
+                4,6,5,     7,5,6,    // back
+                8,9,10,    11,10,9,  // right
+                12,13,14,  15,14,13, // left
+                16,17,18,  19,16,18, // top
+                20,23,22,  21,20,22  // bottom
+                */
+
+                2,1,0,     3,1,2,    // front
+                5,6,4,     6,5,7,    // back
+                10,9,8,    9,10,11,  // right
+                14,13,12,  13,14,15, // left
+                18,17,16,  18,16,19, // top
+                22,23,20,  22,20,21  // bottom
+
+            };
+            var m = new Mesh(verts, ind);
+            m.GenNormals();
+            return m;
         }
 
         public static Mesh GenPlane(int width, int height) {
@@ -435,6 +501,11 @@ namespace Stopgap {
                 0, 1, 2,
                 1, 3, 2
             });
+        }
+
+
+        public Mesh Copy() {
+            return new Mesh(this.vertices, this.indices);
         }
 
     }

@@ -2,7 +2,7 @@
 
 uniform sampler2D colorBuffer;
 uniform sampler2D brightnessBuffer;
-uniform float exposure = 1.0;
+uniform float exposure = 2.0;
 
 in vec2 uv;
 

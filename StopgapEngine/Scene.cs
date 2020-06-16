@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using SixLabors.ImageSharp.Formats.Gif;
 using Nums;
 using SixLabors.ImageSharp.Processing;
+using System.Security.Cryptography;
+using System.Runtime.CompilerServices;
 
 namespace Stopgap {
     public class Scene {
@@ -26,11 +28,13 @@ namespace Stopgap {
             _gameObjects.Add(o);
         }
 
-
+        
         internal void Update() {
-            for (int i = 0; i < _gameObjects.Count; i++)
-                _gameObjects[i].Update();
+            UpdateEvent?.Invoke();
         }
+
+        internal event Action UpdateEvent;
+
 
         public GameObject Spawn(params Component[] comps) {
             var g = new GameObject(comps);
@@ -39,10 +43,13 @@ namespace Stopgap {
         }
 
         internal void processCollisions() {
+
             for (int i = 0; i < _gameObjects.Count; i++) {
                 var g1 = _gameObjects[i];
                 for (int j = i + 1; j < _gameObjects.Count; j++) {
                     var g2 = _gameObjects[j];
+                    
+                    if (g1 == null) break;
 
                     for (int c1 = 0; c1 < g1.colliders.Count; c1++) {
                         for (int c2 = 0; c2 < g2.colliders.Count; c2++) {
@@ -54,10 +61,10 @@ namespace Stopgap {
                             }
                         }
                     }
-
                 }
             }
         }
+
 
         public GameObject raycast(vec3 pos, vec3 dir) {
             for (int i = 0; i < _gameObjects.Count; i++) {

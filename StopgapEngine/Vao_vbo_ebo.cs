@@ -15,7 +15,7 @@ namespace Stopgap {
     /// <typeparam name="T"></typeparam>
     public class Vao_vbo_ebo<T> where T : struct {
 
-        private readonly VertexArray vao;
+        private readonly Vertexarray vao;
         private readonly Buffer<T> vbo;
         private readonly Buffer<uint> ebo;
 
@@ -23,7 +23,7 @@ namespace Stopgap {
         public readonly List<uint> indices = new List<uint>();
 
         public Vao_vbo_ebo() {
-            vao = new VertexArray();
+            vao = new Vertexarray();
             vbo = new Buffer<T>();
             ebo = new Buffer<uint>();
             vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vbo);
