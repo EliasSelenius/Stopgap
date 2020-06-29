@@ -29,14 +29,12 @@ namespace Stopgap {
     public class ParticleSystem : Component, IRenderable {
 
         private static readonly Mesh quad;
-        private static readonly ShaderProgram program;
 
         static ParticleSystem() {
             quad = Mesh.GenQuad(); quad.Init();
-            program = Assets.Shaders["default"];
         }
 
-        public IMaterial material;
+        public Material material;
         private readonly List<Particle> particles = new List<Particle>();
         public float spawnRate;
         public float lifetime;
@@ -49,15 +47,15 @@ namespace Stopgap {
 
         public Func<Particle> newParticle = null;
 
-        public ParticleSystem(IMaterial material, float spawnRate, float lifetime) {
+        public ParticleSystem(Material material, float spawnRate, float lifetime) {
             this.material = material;
             this.spawnRate = spawnRate;
             this.lifetime = lifetime;
 
         }
 
-        protected override void OnEnter() => Game.renderer.SetObject(gameObject.scene, program, this);
-        protected override void OnLeave() => Game.renderer.RemoveObject(gameObject.scene, program, this);
+        protected override void OnEnter() => Game.renderer.SetObject(gameObject.scene, material.shader, this);
+        protected override void OnLeave() => Game.renderer.RemoveObject(gameObject.scene, material.shader, this);
 
         protected override void Update() {
             for (int i = 0; i < particles.Count; i++) {
@@ -98,7 +96,7 @@ namespace Stopgap {
 
         public void Render(ShaderProgram shader) {
 
-            material.Apply(shader);
+            material.apply();
             for (int i = 0; i < particles.Count; i++) {
                 var particle = particles[i];
                 var m = Matrix4.CreateTranslation(particle.pos.ToOpenTKVec());

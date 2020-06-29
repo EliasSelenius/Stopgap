@@ -8,23 +8,26 @@ using System.Threading.Tasks;
 namespace Stopgap {
     public class ObjectPool<T> where T : class, new() {
 
-        private readonly List<T> inuse = new List<T>();
         private readonly List<T> unused = new List<T>();
 
-        public T GetNewObject() {
+        public void pre_alloc(int count) {
+            for (int i = 0; i < count; i++) {
+                return_object(@new());
+            }
+        }
+
+        private T @new() => new T();
+
+        public T get_object() {
             T res = null;
             if (unused.Any()) {
                 res = unused[0];
                 unused.Remove(res);
-            } else {
-                res = new T();
             }
-            inuse.Add(res);
-            return res;
+            return res ?? @new();
         }
 
-        public void Unuse(T t) {
-            inuse.Remove(t);
+        public void return_object(T t) {
             unused.Add(t);
         }
 

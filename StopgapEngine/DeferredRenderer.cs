@@ -70,7 +70,7 @@ namespace Stopgap {
             gBuffer = new GBuffer(Game.window.Width, Game.window.Height);
             
             gBufferShader = ShaderProgram.create(Shaders.ShaderResources.gBufferFrag, Shaders.ShaderResources.vertex);
-            shader = gBufferShader;
+            default_shader = gBufferShader;
             
             lightningPassShader = ShaderProgram.create(Shaders.ShaderResources.lightPassFrag, Shaders.ShaderResources.imageVertex);
             lightningPassShader.set_int("gPosition", 0);

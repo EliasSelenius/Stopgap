@@ -45,7 +45,7 @@ namespace Stopgap {
             InitializeScreenQuad();
         }
 
-        public ShaderProgram shader {
+        public ShaderProgram default_shader {
             get => Assets.Shaders["default"];
             set => Assets.Shaders["default"] = value;
         }
@@ -80,21 +80,6 @@ namespace Stopgap {
 
         internal abstract void Render();
 
-
-        public static ShaderProgram createShader(string frag, string vert, string geo = null) {
-            var shaders = new List<Shader>() {
-                new Shader(ShaderType.FragmentShader, frag),
-                new Shader(ShaderType.VertexShader, vert)
-            };
-
-            if (geo != null) shaders.Add(new Shader(ShaderType.GeometryShader, geo));
-
-            var res = new ShaderProgram(shaders.ToArray());
-
-            foreach (var item in shaders) item.Dispose();
-
-            return res;
-        }
 
         protected void renderScene() {
             var so = groups[Game.scene];

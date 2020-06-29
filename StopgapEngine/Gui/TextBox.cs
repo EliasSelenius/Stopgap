@@ -13,10 +13,10 @@ using Glow;
 using Nums;
 
 namespace Stopgap.Gui {
-    public class TextBox : Element {
+    public class Textbox : Element {
 
         public readonly Font font = Font.Arial;
-        public float lineSpace = .12f;
+        public float line_space = .12f;
         public float font_size = 0.6f;
 
         public string text { get; private set; } = "";
@@ -28,7 +28,7 @@ namespace Stopgap.Gui {
 
 
         private vec2 cursor;
-        private int cursorIndex = -1;
+        private int cursor_index = -1;
         private Quad cursor_quad;
 
         private List<vec4> vertices = new List<vec4>();
@@ -38,7 +38,7 @@ namespace Stopgap.Gui {
         public bool editable = false;
         private bool currently_editing = false;
 
-        public TextBox() {
+        public Textbox() {
 
             vao = new Vertexarray();
 
@@ -129,7 +129,7 @@ namespace Stopgap.Gui {
             for (int i = 0; i < quads.Count; i++) {
 
                 // place cursor
-                if (cursorIndex == i) {
+                if (cursor_index == i) {
                     addQuadData(cursor_quad, quadsCount, vertices, indices);
                     quadsCount++;
                 }
@@ -143,12 +143,12 @@ namespace Stopgap.Gui {
                 var next = i == quads.Count - 1 ? 0 : quads[i + 1].glyph.size.x;
                 if (cursor.x + next > hs.x) {
                     cursor.x = -hs.x;
-                    cursor.y -= lineSpace * font_size;
+                    cursor.y -= line_space * font_size;
                 }
             }
 
             // place cursor
-            if (cursorIndex == quads.Count) 
+            if (cursor_index == quads.Count) 
                 addQuadData(cursor_quad, quadsCount, vertices, indices);
 
 
@@ -158,23 +158,25 @@ namespace Stopgap.Gui {
             //reInitCursor();
         }
 
+        
         private IEnumerable<Quad> getQuads(string text) => text.Select(x => new Quad(font.GetChar(x)));
         
 
         private void addChar(char c) {
             quads.Add(new Quad(font.GetChar(c)));
             text += c;
-            cursorIndex++;
+            cursor_index++;
         }
         private void subChar(int index) {
             quads.RemoveAt(index);
             text = text.Remove(index);
-            cursorIndex--;
+            cursor_index--;
         }
 
-        public void InsertText(int index, string text) {
-            quads.InsertRange(index, getQuads(text));
-            text.Insert(index, text);
+        public void InsertText(int index, string txt) {
+            quads.InsertRange(index, getQuads(txt));
+            text = text.Insert(index, txt);
+            cursor_index += txt.Length;
             Apply();
         }
 
@@ -186,6 +188,7 @@ namespace Stopgap.Gui {
         public void RemoveText(int index, int count) {
             quads.RemoveRange(index, count);
             text = text.Remove(index, count);
+            cursor_index = index;
             Apply();
         }
 
@@ -200,13 +203,13 @@ namespace Stopgap.Gui {
         private void TextBox_OnFocus(Element obj) {
             if (editable) {
                 currently_editing = true;
-                cursorIndex = text.Length;
+                cursor_index = text.Length;
                 Apply();
             } 
         }
         private void TextBox_OnUnfocus(Element obj) {
             currently_editing = false;
-            cursorIndex = -1;
+            cursor_index = -1;
             Apply();
         }
 
@@ -222,11 +225,12 @@ namespace Stopgap.Gui {
             Texture.unbind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
         }
 
-        public event Action<TextBox, OpenTK.Input.KeyboardKeyEventArgs> OnInput;
+        public event Action<Textbox, OpenTK.Input.KeyboardKeyEventArgs> OnInput;
 
         private void Window_KeyPress(object sender, OpenTK.KeyPressEventArgs e) {
             if (currently_editing) {
-                AppendText(e.KeyChar.ToString());
+                //AppendText(e.KeyChar.ToString());
+                InsertText(cursor_index, e.KeyChar.ToString());
             }
         }
 
@@ -234,12 +238,12 @@ namespace Stopgap.Gui {
             if (currently_editing) {
                 OnInput?.Invoke(this, e);
                 if (e.Key == OpenTK.Input.Key.BackSpace && quads.Count > 0) {
-                    RemoveText(quads.Count - 1, 1); 
+                    RemoveText(cursor_index - 1, 1); 
                 } else {
-                    if (e.Key == OpenTK.Input.Key.Left && cursorIndex != 0) {
-                        cursorIndex--; Apply();
-                    } else if (e.Key == OpenTK.Input.Key.Right && cursorIndex != text.Length) { 
-                        cursorIndex++; Apply();
+                    if (e.Key == OpenTK.Input.Key.Left && cursor_index != 0) {
+                        cursor_index--; Apply();
+                    } else if (e.Key == OpenTK.Input.Key.Right && cursor_index != text.Length) { 
+                        cursor_index++; Apply();
                     }
                 }
             }

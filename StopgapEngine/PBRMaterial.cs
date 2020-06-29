@@ -14,6 +14,10 @@ namespace Stopgap {
 
         Dictionary<string, propvalue> props = new Dictionary<string, propvalue>();
 
+        public Material(ShaderProgram shader) {
+            this.shader = shader;
+        }
+
         interface propvalue {
             void set(string name, ShaderProgram s);
         }
@@ -34,42 +38,51 @@ namespace Stopgap {
             public void set(string name, ShaderProgram s) => s.set_vec4(name, value);
         }
 
-        public void set_float(string name, float value) {
-            props[name] = new float_prop { value = value };
-        }
-        public void set_vec2(string name, vec2 value) {
-            props[name] = new vec2_prop { value = value };
-        }
-        public void set_vec3(string name, vec3 value) {
-            props[name] = new vec3_prop { value = value };
-        }
-        public void set_vec4(string name, vec4 value) {
-            props[name] = new vec4_prop { value = value };
-        }
+        public void set_float(string name, float value) => props[name] = new float_prop { value = value };
+        public float get_float(string name) => (props[name] as float_prop).value;
 
-        internal void Apply() {
+        public void set_vec2(string name, vec2 value) => props[name] = new vec2_prop { value = value };
+        public vec2 get_vec2(string name) => (props[name] as vec2_prop).value;
+        
+        public void set_vec3(string name, vec3 value) => props[name] = new vec3_prop { value = value };
+        public vec3 get_vec3(string name) => (props[name] as vec3_prop).value;
+
+        public void set_vec4(string name, vec4 value) => props[name] = new vec4_prop { value = value };
+        public vec4 get_vec4(string name) => (props[name] as vec4_prop).value;
+
+        internal void apply() {
             foreach (var item in props) {
                 item.Value.set(item.Key, shader);
             }
         }
     }
 
-    public interface IMaterial {
-        void Apply(ShaderProgram shader);
-    }
  
-    public class PBRMaterial : IMaterial {
+    public class PBRMaterial : Material {
 
-        public vec3 albedo;
-        public float metallic;
-        public float roughness;
-        public vec3 emission;
 
-        public void Apply(ShaderProgram shader) {
-            shader.set_vec3("albedo", albedo);
-            shader.SetFloat("metallic", metallic);
-            shader.SetFloat("roughness", roughness);
-            shader.set_vec3("emission", emission);
+        public vec3 albedo {
+            get => this.get_vec3("albedo");
+            set => this.set_vec3("albedo", value);
+        }
+        public float metallic {
+            get => this.get_float("metallic");
+            set => this.set_float("metallic", value);
+        }
+        public float roughness {
+            get => this.get_float("roughness");
+            set => this.set_float("roughness", value);
+        }
+        public vec3 emission {
+            get => this.get_vec3("emission");
+            set => this.set_vec3("emission", value);
+        }
+
+        public PBRMaterial() : base(Game.renderer.default_shader) {
+            albedo = 1;
+            metallic = 0;
+            roughness = 0;
+            emission = 0;
         }
 
         public static readonly PBRMaterial Default = new PBRMaterial {
@@ -79,7 +92,7 @@ namespace Stopgap {
         };
     }
 
-    public class BlinnPhongMaterial : IMaterial {
+    public class BlinnPhongMaterial {
 
         public Texture2D diffuseTexture;
         public vec3 diffuseColor;

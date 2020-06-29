@@ -22,10 +22,10 @@ namespace Stopgap.Gui {
         public Canvas canvas { get; private set; }
         public Element parent { get; private set; }
         public readonly List<Element> children = new List<Element>();
-        public bool IsLeafNode => children.Count == 0;
-        public bool IsRootNode => parent == null;
-        public bool HasParent => parent != null;
-        public bool IsInFocus => canvas.focusedElement == this;
+        public bool is_leafnode => children.Count == 0;
+        public bool is_rootnode => parent == null;
+        public bool has_parent => parent != null;
+        public bool focused => canvas.focusedElement == this;
 
         public Anchor anchor = Anchor.center;
         public unit2 size = new unit2(UnitType.viewHeight, .5f, .5f);
@@ -56,8 +56,8 @@ namespace Stopgap.Gui {
 
         public bool draw_background = true;
         public vec4 background_color = (.7f, .7f, .7f, 1);
-        public bool Visible = true;
-        public bool Active = true;
+        public bool visible = true;
+        public bool active = true;
 
 
         protected virtual void OnConnected() { }
@@ -106,7 +106,7 @@ namespace Stopgap.Gui {
 
         internal void Render() {
 
-            if (!Visible) return;
+            if (!visible) return;
 
             if (draw_background) {
                 Canvas.rectShader.use();
@@ -131,7 +131,7 @@ namespace Stopgap.Gui {
         }
 
         public void Unfocus() {
-            if (IsInFocus) {
+            if (focused) {
                 canvas.focusedElement = null;
                 OnUnfocus?.Invoke(this);
             }
@@ -139,7 +139,7 @@ namespace Stopgap.Gui {
 
         internal void UpdateEvents() {
 
-            if (!Active) return;
+            if (!active) return;
 
             var mp = Input.MousePos_ndc;
             var hs = size_ndc * .5f;

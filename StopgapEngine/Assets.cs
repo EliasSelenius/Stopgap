@@ -157,4 +157,17 @@ namespace Stopgap {
         }
 
     }
+
+
+
+    public class Assetpack {
+        public interface IAsset {
+
+        }
+
+        private readonly Dictionary<string, IAsset> assets = new Dictionary<string, IAsset>();
+
+        public IAsset get_asset(string name) => assets[name];
+
+    }
 }

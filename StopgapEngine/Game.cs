@@ -11,6 +11,7 @@ using OpenTK.Graphics.OpenGL4;
 using Glow;
 using Nums;
 using System.Threading;
+using OpenTK.Graphics;
 
 namespace Stopgap {
     public static class Game {
@@ -29,9 +30,10 @@ namespace Stopgap {
         internal static Thread collisons_thread;
 
         static Game() {
-            window = new GameWindow(1600, 900);
+            window = new GameWindow(1600, 900, GraphicsMode.Default, "Stopgap");
             window.VSync = VSyncMode.Off;
             //window.WindowState = WindowState.Fullscreen;
+            
 
             window.Resize += Window_Resize;
             window.RenderFrame += Window_RenderFrame;
@@ -70,7 +72,7 @@ namespace Stopgap {
             var c = Game.canvas ??= new Gui.Canvas(window.Width, window.Height);
 
             // FPS display:
-            var fpsd = c.Create<Gui.TextBox>();
+            var fpsd = c.Create<Gui.Textbox>();
             fpsd.font_size = 0.25f;
             fpsd.size = Gui.unit2.parse("0.1vw 0.03vh");
             fpsd.pos = Gui.unit2.parse("-0.5vw 0.5vh");

@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="data\canvas.xml" />
     <Content Include="data\textures\noise.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -15,26 +15,24 @@ namespace Stopgap {
     public class Billboard : Component, IRenderable {
 
         private static readonly Mesh quad;
-        private static readonly ShaderProgram program;
 
         static Billboard() {
             quad = Mesh.GenQuad(); quad.Init();
-            program = Assets.Shaders["default"];
         }
 
 
-        public IMaterial material;
+        public Material material;
         
-        public Billboard(IMaterial material) {
+        public Billboard(Material material) {
             this.material = material;
         }
 
         protected override void OnEnter() {
-            Game.renderer.SetObject(gameObject.scene, program, this);
+            Game.renderer.SetObject(gameObject.scene, material.shader, this);
         }
 
         protected override void OnLeave() {
-            Game.renderer.RemoveObject(gameObject.scene, program, this);
+            Game.renderer.RemoveObject(gameObject.scene, material.shader, this);
         }
 
         public void Render(ShaderProgram shader) {
@@ -59,13 +57,14 @@ namespace Stopgap {
             m.M31 = v.M13;
             m.M32 = v.M23;
             m.M33 = v.M33;
+            
 
             m *= Matrix4.CreateRotationZ(transform.rotation.ToAxisAngle().W);
             m *= Matrix4.CreateScale(transform.scale.ToOpenTKVec());
             
 
             shader.set_mat4("obj_transform", m);
-            material.Apply(shader);
+            material.apply();
             quad.Render();
         }
 

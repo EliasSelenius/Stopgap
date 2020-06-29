@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 using Glow;
 
@@ -32,6 +33,26 @@ namespace Stopgap.Gui {
         public Canvas(int w, int h) {
             width = w;
             height = h;
+        }
+
+        public Canvas(XmlElement canvas) {
+
+            string get_attrib(XmlElement el, string name, string defvalue) {
+                var a = el.GetAttribute(name);
+                return a == string.Empty ? defvalue : a;
+            }
+            int get_int(XmlElement el, string name, string defvalue) => int.Parse(get_attrib(el, name, defvalue));
+
+            width = get_int(canvas, "width", Game.window.Width.ToString());
+            height = get_int(canvas, "height", Game.window.Height.ToString());
+
+            void process_element(XmlElement el) {
+                // process attributes
+
+                // process children
+            }
+
+
         }
 
         public T Create<T>() where T : Element, new() {

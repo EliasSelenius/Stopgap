@@ -35,7 +35,6 @@ namespace Stopgap {
 
         internal event Action UpdateEvent;
 
-
         public GameObject Spawn(params Component[] comps) {
             var g = new GameObject(comps);
             g.EnterScene(this);

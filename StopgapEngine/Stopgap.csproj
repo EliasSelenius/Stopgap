@@ -103,6 +103,7 @@
     <Compile Include="Gui\Element.cs" />
     <Compile Include="Gui\Graphics.cs" />
     <Compile Include="Gui\Unit.cs" />
+    <Compile Include="ImageeffectBuffers.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="ObjectPool.cs" />
     <Compile Include="ParticleSystem.cs" />
@@ -140,7 +141,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>FontResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Gui\TextBox.cs" />
+    <Compile Include="Gui\Textbox.cs" />
     <Compile Include="Transform.cs" />
     <Content Include="Script\scriptdraft.txt" />
     <Content Include="TestData\colorfullNoise.png" />

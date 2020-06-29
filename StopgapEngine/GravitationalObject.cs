@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -35,9 +36,10 @@ namespace Stopgap {
 
                 var dir = other.transform.position - transform.position;
                 rb.AddForce(dir.normalized() * rb.Mass * other.rb.Mass / dir.sqlength);
-
             }
         }
+
+        
 
     }
 }
