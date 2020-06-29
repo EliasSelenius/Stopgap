@@ -32,7 +32,7 @@ namespace Stopgap {
         public static Camera MainCamera;
 
 
-        public Matrix4 viewMatrix { get; private set; }
+        public Matrix4 view_matrix { get; private set; }
         public Matrix4 projection { get; private set; }
         public float FOV = 70;
         public float NearPlane = .1f;
@@ -48,8 +48,7 @@ namespace Stopgap {
 
 
 
-        // TODO: remove necessity for ShaderProgram argument e.g: remove cam_pos use from shaders
-        internal void UpdateCamUniforms(ShaderProgram program) {
+        internal void update_uniformbuffer() {
             GL.BindBuffer(BufferTarget.UniformBuffer, ubo);
             
             // Projection:
@@ -61,17 +60,12 @@ namespace Stopgap {
 
             // View:
             var view = Matrix4.LookAt(transform.position.ToOpenTKVec(), (transform.position + transform.forward).ToOpenTKVec(), transform.up.ToOpenTKVec());
-            viewMatrix = view;
+            view_matrix = view;
             //program.SetMat4("cam_view", lookat);
             GL.BufferSubData(BufferTarget.UniformBuffer, (IntPtr)64, 64, ref view);
 
 
             GL.BindBuffer(BufferTarget.UniformBuffer, 0);
-
-
-            // Position:
-            program.set_vec3("cam_pos", transform.position);
-
         }
 
         public vec3 screenToRay(vec2 ndc) {
@@ -81,7 +75,7 @@ namespace Stopgap {
             screenPoint.Z = -1;
             screenPoint.W = 0;
 
-            var point = (screenPoint * viewMatrix.Inverted()).Xyz;
+            var point = (screenPoint * view_matrix.Inverted()).Xyz;
             point.Normalize();
             return point.ToNumsVec();
         }

@@ -28,17 +28,19 @@ namespace Stopgap {
         }
 
         protected override void OnEnter() {
-            Game.renderer.SetObject(gameObject.scene, material.shader, this);
+            //Game.renderer.SetObject(gameObject.scene, material.shader, this);
+            scene.renderables.Add(this);
         }
 
         protected override void OnLeave() {
-            Game.renderer.RemoveObject(gameObject.scene, material.shader, this);
+            //Game.renderer.RemoveObject(gameObject.scene, material.shader, this);
+            scene.renderables.Remove(this);
         }
 
-        public void Render(ShaderProgram shader) {
+        public void render() {
 
             var m = Matrix4.CreateTranslation(transform.position.ToOpenTKVec());
-            var v = Camera.MainCamera.viewMatrix;
+            var v = Camera.MainCamera.view_matrix;
 
             /*
              m11 m12 m13
@@ -63,7 +65,7 @@ namespace Stopgap {
             m *= Matrix4.CreateScale(transform.scale.ToOpenTKVec());
             
 
-            shader.set_mat4("obj_transform", m);
+            material.shader.set_mat4("model", m);
             material.apply();
             quad.Render();
         }

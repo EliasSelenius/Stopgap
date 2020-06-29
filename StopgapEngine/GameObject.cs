@@ -18,17 +18,14 @@ namespace Stopgap {
 
         public readonly Transform transform = new Transform();
 
-        public bool IsRoot => parent == null;
-        public bool IsParent => _children.Count > 0;
-        public bool IsChild => parent != null;
+        public bool is_root => parent == null;
+        public bool is_parent => _children.Count > 0;
+        public bool is_child => parent != null;
 
         public Matrix4 model_matrix {
             get {
                 var m = transform.matrix;
-                if (parent != null) {
-                    return m * parent.model_matrix;
-                }
-                return m;
+                return is_child ? m * parent.model_matrix : m;
             }
         }
 
@@ -79,7 +76,7 @@ namespace Stopgap {
 
             _components.Add(c);
             c.Init(this);
-            if (HasStarted) { 
+            if (has_started) { 
                 c.Start();
                 if (scene != null) c.Enter();
             }
@@ -91,10 +88,10 @@ namespace Stopgap {
             }
         }
 
-        public bool HasStarted { get; private set; } = false;
+        public bool has_started { get; private set; } = false;
         internal void Start() {
             for (int i = 0; i < components.Count; i++) components[i].Start();
-            HasStarted = true;
+            has_started = true;
         }
 
 
@@ -103,14 +100,14 @@ namespace Stopgap {
             if (scene == s) return;
 
             // make sure gameobject has 'started'
-            if (!HasStarted) this.Start();
+            if (!has_started) this.Start();
             // allow chilldren to enter first
             for (int i = 0; i < _children.Count; i++) _children[i].EnterScene(s);
             // leave current scene before entering the new one
             if (scene != null) LeaveScene();
             // enter scene
             scene = s;
-            scene._AddObject(this);
+            scene._add_object(this);
             // notify components that we have entered a scene
             for (int i = 0; i < _components.Count; i++) _components[i].Enter();
             
@@ -120,7 +117,7 @@ namespace Stopgap {
             if (scene == null) return;
             for (int i = 0; i < children.Count; i++) _children[i].LeaveScene();
             for (int i = 0; i < _components.Count; i++) _components[i].Leave();
-            scene._RemoveObject(this);
+            scene._remove_object(this);
             scene = null;
         }
 

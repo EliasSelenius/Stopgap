@@ -10,7 +10,6 @@ in VS_OUT {
 } vInput;
 
 
-
 // material parameters
 uniform vec3  albedo;
 uniform float metallic;
@@ -18,7 +17,11 @@ uniform float roughness;
 uniform vec3  emission;
 
 
-uniform vec3 cam_pos;
+layout (std140) uniform Camera {
+	mat4 projection;
+	mat4 view;
+};
+
 
 struct Light {
     vec3 dir;
@@ -39,7 +42,9 @@ vec3 CalcDirLightPBR(vec3 F0, vec3 N, vec3 V);
 void main()
 {		
     vec3 N = normalize(vInput.normal);
-    vec3 V = normalize(cam_pos - vInput.fragPos);
+
+    //vec3 V = normalize(cam_pos - vInput.fragPos);
+    vec3 V = normalize(-vInput.fragPos);
 
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
@@ -61,7 +66,8 @@ void main()
 
 vec3 CalcDirLightPBR(vec3 F0, vec3 N, vec3 V) {
     // calculate per-light radiance
-    vec3 L = normalize(-dirLight.dir);
+    //vec3 L = normalize(-dirLight.dir);
+    vec3 L = normalize(-(view * vec4(dirLight.dir, 0.0)).xyz);
     vec3 H = normalize(V + L);
     //float distance    = length(lightPositions[i] - vInput.fragPos);
     //float attenuation = 1.0 / (distance * distance);

@@ -16,14 +16,16 @@ namespace Stopgap.Gui {
         }
 
         protected override void OnEnter() {
-            Game.renderer.SetObject(gameObject.scene, Canvas.rectShader, this);
+            scene.renderables.Add(this);
+            //Game.renderer.SetObject(gameObject.scene, Canvas.rectShader, this);
         }
 
         protected override void OnLeave() {
-            Game.renderer.RemoveObject(gameObject.scene, Canvas.rectShader, this);
+            scene.renderables.Remove(this);
+            //Game.renderer.RemoveObject(gameObject.scene, Canvas.rectShader, this);
         }
 
-        public void Render(ShaderProgram shader) {
+        public void render() {
             canvas.Render();
         }
     }

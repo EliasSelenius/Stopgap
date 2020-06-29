@@ -48,7 +48,6 @@ namespace Stopgap {
 
         public static void SetScene(Scene scene) {
             Game.scene = scene;
-            renderer.EnsureScene(scene);
         }
 
         public static void Run() {

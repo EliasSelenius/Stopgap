@@ -11,7 +11,7 @@ namespace Stopgap {
 
 
     public interface IRenderable {
-        void Render(ShaderProgram shader);
+        void render();
     }
 
     public abstract class Renderer {
@@ -50,30 +50,6 @@ namespace Stopgap {
             set => Assets.Shaders["default"] = value;
         }
 
-        #region rendring groups controll funcs
-
-        protected readonly Dictionary<Scene, Dictionary<ShaderProgram, List<IRenderable>>> groups = new Dictionary<Scene, Dictionary<ShaderProgram, List<IRenderable>>>();
-
-
-        internal void EnsureScene(Scene scene) {
-            if (!groups.ContainsKey(scene))
-                groups.Add(scene, new Dictionary<ShaderProgram, List<IRenderable>>());
-        }
-
-        internal void SetObject(Scene scene, ShaderProgram shader, IRenderable renderable) {
-            if (!groups.ContainsKey(scene))
-                groups.Add(scene, new Dictionary<ShaderProgram, List<IRenderable>>());
-            if (!groups[scene].ContainsKey(shader))
-                groups[scene].Add(shader, new List<IRenderable>());
-
-            groups[scene][shader].Add(renderable);
-        }
-
-        internal void RemoveObject(Scene scene, ShaderProgram shader, IRenderable renderable) {
-            groups[scene][shader].Remove(renderable);
-        }
-
-        #endregion
 
 
         internal virtual void OnWindowResize(int w, int h) { }
@@ -81,35 +57,14 @@ namespace Stopgap {
         internal abstract void Render();
 
 
-        protected void renderScene() {
-            var so = groups[Game.scene];
-            foreach (var item in so) {
-                var shader = item.Key;
-                shader.use();
+        protected void renderScene(Scene scene) {
 
-                shader.SetFloat("time", Game.time);
+            var s = default_shader;
+            s.use();
+            Camera.MainCamera.update_uniformbuffer();
+            scene.directionalLight.UpdateUniforms(s);
+            scene.render();
 
-                Camera.MainCamera.UpdateCamUniforms(shader);
-
-                Game.scene.directionalLight.UpdateUniforms(shader);
-
-                // render all objects:
-                foreach (var obj in item.Value) {
-                    obj.Render(shader);
-                }
-
-                // render again with normals
-                /*if (renderNormals) {
-                    normalsRenderingShader.use();
-                    foreach (var obj in item.Value) {
-                        obj.Render(normalsRenderingShader);
-                    }
-                }*/
-
-            }
-
-            // skybox
-            Game.scene.skybox?.Render();
         }
     }
 }

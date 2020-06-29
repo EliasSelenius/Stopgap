@@ -21,10 +21,21 @@ namespace Stopgap {
         private readonly List<GameObject> _gameObjects = new List<GameObject>();
         public ReadOnlyCollection<GameObject> gameObjects => _gameObjects.AsReadOnly();
 
-        internal void _RemoveObject(GameObject o) {
+        internal readonly List<IRenderable> renderables = new List<IRenderable>();  
+        internal void render() {
+            foreach (var renderable in renderables) {
+                renderable.render();
+            }
+
+            // skybox
+            skybox?.render();
+        }
+
+
+        internal void _remove_object(GameObject o) {
             _gameObjects.Remove(o);
         }
-        internal void _AddObject(GameObject o) {
+        internal void _add_object(GameObject o) {
             _gameObjects.Add(o);
         }
 
@@ -35,7 +46,7 @@ namespace Stopgap {
 
         internal event Action UpdateEvent;
 
-        public GameObject Spawn(params Component[] comps) {
+        public GameObject spawn(params Component[] comps) {
             var g = new GameObject(comps);
             g.EnterScene(this);
             return g;

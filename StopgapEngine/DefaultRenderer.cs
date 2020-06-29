@@ -39,9 +39,7 @@ namespace Stopgap {
             GL.ClearColor(0, 0, 0, 1);
 
 
-            //shader = createShader(Shaders.ShaderResources.fragement, Shaders.ShaderResources.vertex);
             default_shader = ShaderProgram.create(Shaders.ShaderResources.PBRfrag, Shaders.ShaderResources.vertex);
-
             default_shader.uniformblock_binding("Camera", 0);
 
             normalsRenderingShader = ShaderProgram.create(Shaders.ShaderResources.normalsFragment, Shaders.ShaderResources.normalsVertex, Shaders.ShaderResources.normalGeometry);
@@ -60,7 +58,7 @@ namespace Stopgap {
 
             // bind these buffers to be rendererd on to
             image_effect_buffers.bind();
-            renderScene(); // render the scene to it
+            renderScene(Game.scene); // render the scene to it
             image_effect_buffers.render(); // finaly render the buffers on to the screen
 
 

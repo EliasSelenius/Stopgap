@@ -88,7 +88,7 @@ namespace Stopgap {
             GL.DepthFunc(DepthFunction.Lequal);
             gBufferShader.use();
 
-            renderScene();
+            renderScene(Game.scene);
 
             int w = Game.window.Width, h = Game.window.Height;
             Framebuffer.copy_region(gBuffer.framebuffer, 0, 0, w, h, Framebuffer.default_buffer, 0, 0, w, h, ClearBufferMask.DepthBufferBit, Filter.Nearest);

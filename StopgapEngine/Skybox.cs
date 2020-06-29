@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Glow;
-
+using Nums;
 using OpenTK.Graphics.OpenGL4;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
@@ -23,9 +23,7 @@ namespace Stopgap {
         static Skybox() {
 
             boxvao = new Vertexarray();
-
-            vbo = new Buffer<float>();
-            vbo.bufferdata(new float[] {
+            vbo = Glow.Buffer.create(new float[] {
                 -1.0f,  1.0f, -1.0f,
                 -1.0f, -1.0f, -1.0f,
                  1.0f, -1.0f, -1.0f,
@@ -67,25 +65,24 @@ namespace Stopgap {
                  1.0f, -1.0f, -1.0f,
                 -1.0f, -1.0f,  1.0f,
                  1.0f, -1.0f,  1.0f
-            }, BufferUsageHint.StaticDraw);
+            });
 
             boxvao.set_buffer(BufferTarget.ArrayBuffer, vbo);
             boxvao.attrib_pointer(0, 3, VertexAttribPointerType.Float, false, sizeof(float) * 3, 0);
-
+            //boxvao.set_attribute_pointer(0, AttribType.Vec3, vbo, vec3.bytesize);
         }
 
         public Skybox(ShaderProgram shader) {
             this.shader = shader;
         }
 
-        internal void Render() {
+        internal void render() {
             shader.use();
-            Camera.MainCamera.UpdateCamUniforms(shader);
-            onRender();
+            on_render();
             boxvao.draw_arrays(PrimitiveType.Triangles, 0, 36);
         }
 
-        protected virtual void onRender() { }
+        protected virtual void on_render() { }
 
     }
 
@@ -119,7 +116,7 @@ namespace Stopgap {
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)All.ClampToEdge);
         }
 
-        protected override void onRender() {
+        protected override void on_render() {
             GL.BindTexture(TextureTarget.TextureCubeMap, cubeMapId);
         }
 

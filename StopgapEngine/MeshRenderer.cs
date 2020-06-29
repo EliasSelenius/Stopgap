@@ -25,15 +25,17 @@ namespace Stopgap {
         }
 
         protected override void OnEnter() {
-            Game.renderer.SetObject(gameObject.scene, material.shader, this);
+            //Game.renderer.SetObject(gameObject.scene, material.shader, this);
+            scene.renderables.Add(this);
         }
 
         protected override void OnLeave() {
-            Game.renderer.RemoveObject(gameObject.scene, material.shader, this);
+            //Game.renderer.RemoveObject(gameObject.scene, material.shader, this);
+            scene.renderables.Remove(this);
         }
 
-        public void Render(ShaderProgram shader) {
-            shader.set_mat4("obj_transform", gameObject.model_matrix);
+        public void render() {
+            material.shader.set_mat4("model", gameObject.model_matrix);
             material.apply();
 
             mesh.Render(primitiveType);
