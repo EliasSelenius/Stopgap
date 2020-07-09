@@ -23,5 +23,10 @@ engine features:
 
 
 optimalization techniques:
-	threading
-	compute shader
+	- multithreading
+	- async programing pattern
+	- coroutines
+	- instancing
+	- compute shaders
+	- objectpool (minimize allocations/deallocations)
+	- data-oriented design (cach-friendly data structures)

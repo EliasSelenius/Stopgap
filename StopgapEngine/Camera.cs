@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,24 +30,23 @@ namespace Stopgap {
         }
 
 
-        public static Camera MainCamera;
-
-
         public Matrix4 view_matrix { get; private set; }
         public Matrix4 projection { get; private set; }
         public float FOV = 70;
         public float NearPlane = .1f;
         public float FarPlane = 100000;
 
-        public void SetToMain() {
-            MainCamera = this;
+        public void use() {
+            scene.main_camera = this;
         }
 
-        public override void Start() {
-            SetToMain();
+        protected override void OnEnter() {
+            use();
         }
 
-
+        protected override void OnLeave() {
+            if (scene.main_camera == this) scene.main_camera = null;
+        }
 
         internal void update_uniformbuffer() {
             GL.BindBuffer(BufferTarget.UniformBuffer, ubo);

@@ -11,7 +11,7 @@ namespace Stopgap {
 
         public readonly Mesh mesh;
         public Material material;
-        
+
         public OpenTK.Graphics.OpenGL4.PrimitiveType primitiveType;
 
 
@@ -43,6 +43,21 @@ namespace Stopgap {
 
         public override void Start() {
             mesh.Init();
+        }
+    }
+
+    public class AdvMeshTest : Component, IRenderable {
+        public AdvMesh mesh;
+        public void render() {
+            Game.renderer.default_shader.set_mat4("model", gameObject.model_matrix);
+            mesh.render();
+        }
+        protected override void OnEnter() {
+            scene.renderables.Add(this);
+        }
+
+        protected override void OnLeave() {
+            scene.renderables.Remove(this);
         }
     }
 }

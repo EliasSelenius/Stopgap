@@ -21,7 +21,7 @@ namespace Stopgap {
         public vec3 velocity;
 
         public vec4 color;
-
+        
         public float startTime;
         public float elapsedTime => Game.time - startTime;
     }
@@ -100,7 +100,7 @@ namespace Stopgap {
             for (int i = 0; i < particles.Count; i++) {
                 var particle = particles[i];
                 var m = Matrix4.CreateTranslation(particle.pos.ToOpenTKVec());
-                var v = Camera.MainCamera.view_matrix;
+                var v = Game.current_camera.view_matrix;
 
                 m.M11 = v.M11;
                 m.M12 = v.M21;

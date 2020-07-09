@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stopgap", "StopgapEngine\Stopgap.csproj", "{0F645BEC-3307-44E0-B154-4A12BBB3ACA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stopgap.Editor", "Stopgap.Editor\Stopgap.Editor.csproj", "{4FBEBF30-9918-47E2-8250-B12A53780BD7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StopgapEditor", "Stopgap.Editor\StopgapEditor.csproj", "{4FBEBF30-9918-47E2-8250-B12A53780BD7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

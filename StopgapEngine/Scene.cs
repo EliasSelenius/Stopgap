@@ -13,8 +13,9 @@ using System.Runtime.CompilerServices;
 namespace Stopgap {
     public class Scene {
 
-        public Skybox skybox;
+        public Camera main_camera { get; internal set; }
 
+        public Skybox skybox;
         public readonly DirectionalLight directionalLight = new DirectionalLight();
 
 
@@ -22,7 +23,7 @@ namespace Stopgap {
         public ReadOnlyCollection<GameObject> gameObjects => _gameObjects.AsReadOnly();
 
         internal readonly List<IRenderable> renderables = new List<IRenderable>();  
-        internal void render() {
+        internal virtual void render() {
             foreach (var renderable in renderables) {
                 renderable.render();
             }
@@ -87,5 +88,34 @@ namespace Stopgap {
             return null;
         }
 
+    }
+
+    public class Editor : Scene {
+
+        public static readonly Editor instance;
+
+        static Editor() => instance = new Editor();
+        private Editor() {
+            user = spawn(new Camera(), new CamFlyController());
+        }
+
+        public Scene editing_scene;
+
+        private GameObject user;
+
+
+        public static void play() {
+            Game.SetScene(instance.editing_scene);
+        }
+        public static void open() {
+            if (Game.scene == instance) return;
+            instance.editing_scene = Game.scene;
+            Game.SetScene(instance);
+        }
+
+        internal override void render() {
+            editing_scene?.render();
+            base.render();
+        }
     }
 }

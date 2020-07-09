@@ -55,7 +55,7 @@ namespace Stopgap {
         }
 
         public Mesh GenMesh() {
-            var meshVerts = new List<Vertex>();
+            var meshVerts = new List<vertex>();
             var meshindc = new List<uint>();
 
             uint tr = 0;
@@ -63,7 +63,7 @@ namespace Stopgap {
                 var face = Faces[f];
                 for (uint v = 0; v < face.vertices.Length; v++) {
                     var vert = face.vertices[v];
-                    meshVerts.Add(new Vertex(GetPos(vert.PositionIndex), GetUv(vert.UVIndex), GetNormal(vert.NormalIndex)));
+                    meshVerts.Add(new vertex(GetPos(vert.PositionIndex), GetUv(vert.UVIndex), GetNormal(vert.NormalIndex)));
                     meshindc.Add(tr + v);
                 }
                 tr += 3;

@@ -6,75 +6,72 @@ using System.Threading.Tasks;
 
 using Nums;
 using Glow;
-using SixLabors.Primitives;
 
 namespace Stopgap {
     public class AdvMesh {
 
         // attribute indexes
         const int POSITION = 0;
-        const int NORMAL = 1;
-        const int TEXCOORD = 2;
-        const int COLOR = 3;
+        const int TEXCOORD = 1;
+        const int NORMAL = 2;
 
         // buffers
         Vertexarray vao;
-        Buffer<vec3> positions_buffer;
-        Buffer<vec3> normals_buffer;
-        Buffer<vec2> texcoords_buffer;
-        Buffer<vec4> colors_buffer;
+        Buffer<vertex> vertex_buffer;
         Buffer<uint> element_buffer;
 
         // data
-        readonly List<vec3> positions;
-        readonly List<vec3> normals;
-        readonly List<vec2> texcoords;
-        readonly List<vec4> colors;
-        readonly List<uint> indices;
+        public readonly List<vertex> vertices = new List<vertex>();
+        readonly List<uint> indices = new List<uint>();
+        readonly Dictionary<Material, int> entries = new Dictionary<Material, int>();
 
-        bool has_texcoords => texcoords != null;
-        bool has_vertex_colors => colors != null;
+        public void add_vertex(vec3 pos, vec2 texcoord, vec3 normal) {
+            vertices.Add(new vertex(pos, texcoord, normal));
+        }
+        public void add_triangles(Material material, params uint[] indices) {
+            if (entries.ContainsKey(material)) 
+                entries[material] += indices.Length;
+            else entries[material] = indices.Length;
 
-        List<Entry> entries = new List<Entry>();
-        class Entry {
-            Material material;
-            int count;
-            int offset;
-            public void render() {
-                material.apply();
-                Vertexarray.draw_elements(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, count, ElementsType.UnsignedInt, offset * sizeof(uint));
+            int offset = 0;
+            foreach (var item in entries) {
+                if (item.Key == material) {
+                    this.indices.InsertRange(offset, indices);
+                    break;
+                }
+                offset += item.Value;
             }
         }
 
-        public void add_vertex(vec3 pos, vec3 normal, vec2 texcoord, vec4 color) {
-            positions.Add(pos);
-        }
-        public void add_triangle(Material material, uint a, uint b, uint c) {
-            
-        }
 
-        public AdvMesh(OpenTK.Graphics.OpenGL4.BufferUsageHint hint) {
+        public AdvMesh() {
 
             // init buffers:
-            positions_buffer = Glow.Buffer.create(hint, positions.ToArray());
-            normals_buffer = Glow.Buffer.create(hint, normals.ToArray());
-            if (has_texcoords) texcoords_buffer = Glow.Buffer.create(hint, texcoords.ToArray());
-            if (has_vertex_colors) colors_buffer = Glow.Buffer.create(hint, colors.ToArray());
-            element_buffer = Glow.Buffer.create(hint, indices.ToArray());
+            vertex_buffer = Glow.Buffer.create(this.vertices.ToArray());
+            element_buffer = Glow.Buffer.create(this.indices.ToArray());
 
             // setup vao:
             vao = new Vertexarray();
-            vao.set_attribute_pointer(POSITION, AttribType.Vec3, positions_buffer, vec3.bytesize);
-            vao.set_attribute_pointer(NORMAL, AttribType.Vec3, normals_buffer, vec3.bytesize);
-            if (has_texcoords) vao.set_attribute_pointer(TEXCOORD, AttribType.Vec2, texcoords_buffer, vec2.bytesize);
-            if (has_vertex_colors) vao.set_attribute_pointer(COLOR, AttribType.Vec4, colors_buffer, vec4.bytesize);
+            vao.set_buffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer, vertex_buffer);
+            vao.attrib_pointer(POSITION, AttribType.Vec3, vertex.bytesize, 0);
+            vao.attrib_pointer(TEXCOORD, AttribType.Vec2, vertex.bytesize, vec3.bytesize);
+            vao.attrib_pointer(NORMAL, AttribType.Vec3, vertex.bytesize, vec3.bytesize + vec2.bytesize);
             vao.set_elementbuffer(element_buffer);
         }
 
+        public void bufferdata(OpenTK.Graphics.OpenGL4.BufferUsageHint hint = OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw) {
+            vertex_buffer.bufferdata(vertices.ToArray(), hint);
+            element_buffer.bufferdata(indices.ToArray(), hint);
+        }
 
         public void render() {
             vao.bind();
-            foreach (Entry entry in entries) entry.render();
+            int offset = 0;
+            foreach (var item in entries) {
+                item.Key.apply();
+                Vertexarray.draw_elements(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, item.Value, ElementsType.UnsignedInt, offset * sizeof(uint));
+                offset += item.Value;
+            }
             Vertexarray.unbind();
         }
 

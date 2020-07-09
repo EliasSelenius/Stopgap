@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Reflection;
 
 using Glow;
 
@@ -37,6 +38,7 @@ namespace Stopgap.Gui {
 
         public Canvas(XmlElement canvas) {
 
+
             string get_attrib(XmlElement el, string name, string defvalue) {
                 var a = el.GetAttribute(name);
                 return a == string.Empty ? defvalue : a;
@@ -46,7 +48,21 @@ namespace Stopgap.Gui {
             width = get_int(canvas, "width", Game.window.Width.ToString());
             height = get_int(canvas, "height", Game.window.Height.ToString());
 
-            void process_element(XmlElement el) {
+            var element_types = new Dictionary<string, Func<XmlElement, Element>>() {
+                { "element", xml => {
+                    return new Element();
+                }},
+                { "textbox", xml => {
+                    var el = new Textbox();
+
+                    return el;
+                }},
+            };
+            
+            void process_element(XmlElement xml_el) {
+
+                var el = element_types[xml_el.Name](xml_el);
+
                 // process attributes
 
                 // process children

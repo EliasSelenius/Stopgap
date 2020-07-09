@@ -14,11 +14,21 @@ using System.Threading;
 using OpenTK.Graphics;
 
 namespace Stopgap {
+
+    /*
+    public class Window : NativeWindow {
+        public Window() {
+            
+        }
+    }*/
+
+
     public static class Game {
 
         public static readonly GameWindow window;
         public static Renderer renderer { get; private set; }
 
+        public static Camera current_camera => scene?.main_camera;
         public static Scene scene { get; private set; }
         public static Gui.Canvas canvas;
 
@@ -83,7 +93,9 @@ namespace Stopgap {
         }
 
         private static void Window_UpdateFrame(object sender, FrameEventArgs e) {
-            time += (deltaTime = (float)e.Time);
+            if (scene != Editor.instance) {
+                time += (deltaTime = (float)e.Time);
+            }
             
             canvas?.Update();
             scene.Update();

@@ -40,7 +40,7 @@ namespace Stopgap {
         public void render() {
 
             var m = Matrix4.CreateTranslation(transform.position.ToOpenTKVec());
-            var v = Camera.MainCamera.view_matrix;
+            var v = Game.current_camera.view_matrix;
 
             /*
              m11 m12 m13

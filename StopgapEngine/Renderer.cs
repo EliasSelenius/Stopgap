@@ -61,7 +61,7 @@ namespace Stopgap {
 
             var s = default_shader;
             s.use();
-            Camera.MainCamera.update_uniformbuffer();
+            scene.main_camera.update_uniformbuffer();
             scene.directionalLight.UpdateUniforms(s);
             scene.render();
 

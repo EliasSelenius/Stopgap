@@ -4,24 +4,53 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Stopgap;
 using Stopgap.Gui;
 using Nums;
 using OpenTK;
 using System.Diagnostics.PerformanceData;
 using System.Xml;
+using System.Runtime.InteropServices;
 
-namespace Stopgap.Editor {
+namespace StopgapEditor {
     class Program {
+
         static void Main(string[] args) {
 
-
             Game.onLoad = () => {
-                
+
                 Game.SetScene(new Scene());
+
 
                 // test multi-material mesh 
                 {
+                    var mesh = new AdvMesh();
 
+                    /*  v1     v2
+                        o------o
+                        |      |
+                        |      |
+                        o------o
+                        v3     v4
+                     */
+
+                    mesh.add_vertex(new vec3(-1, 0, -1), vec2.zero, vec3.unity);
+                    mesh.add_vertex(new vec3( 1, 0, -1), vec2.zero, vec3.unity);
+                    mesh.add_vertex(new vec3(-1, 0,  1), vec2.zero, vec3.unity);
+                    mesh.add_vertex(new vec3( 1, 0,  1), vec2.zero, vec3.unity);
+
+                    var mat = new PBRMaterial {
+                        albedo = (1, 0, 0),
+                        emission = (1, 0.5f, 0)
+                    };
+
+                    mesh.add_triangles(PBRMaterial.Default, 0, 2, 1);
+                    mesh.add_triangles(mat , 1, 2, 3);
+
+                    mesh.bufferdata();
+                    var obj = Game.scene.spawn(new AdvMeshTest { mesh = mesh } /*, new Billboard(PBRMaterial.Default)*/);
+                    obj.transform.position = (-30, 0, 30);
+                    obj.transform.scale *= 10;
                 }
 
 
@@ -34,18 +63,23 @@ namespace Stopgap.Editor {
 
 
                 // test collada import:
-                var xml = new System.Xml.XmlDocument();
-                xml.Load("data/models/Ships2.dae");
-                //var collada = new Collada(xml);
-                //collada.ToGameObject();
+                {
+                    var xml = new System.Xml.XmlDocument();
+                    xml.Load("data/models/Ships2.dae"); //untitled.dae");
+                    var collada = new Collada(xml);
 
+                    var o = Game.scene.spawn(new AdvMeshTest { mesh = collada.to_gameobject() });
+                    o.transform.scale *= 10;
+                    o.transform.position = (-50, 0, -20);
+                }
 
+                
                 var user = new GameObject();
                 user.AddComps(
                     new Camera(),
                     new CamFlyController());
                 user.EnterScene(Game.scene);
-
+                
                 var testObj = new GameObject();
                 testObj.AddComps(
                     new MeshRenderer(Assets.GetMesh("SpaceShip"), PBRMaterial.Default));
@@ -168,9 +202,9 @@ namespace Stopgap.Editor {
                 // init editor Gui
                 
 
-                InitGUI();    
+                InitGUI();
 
-                
+                Editor.open();
             };
 
             Game.Run();
@@ -178,12 +212,12 @@ namespace Stopgap.Editor {
 
         class Test : Component {
             protected override void Update() {
-                transform.position = Camera.MainCamera.screenToRay(Input.MousePos_ndc);
+                transform.position = scene.main_camera.screenToRay(Input.MousePos_ndc);
             }
         }
 
         private static void InitGUI() {
-            var c = Game.canvas = new Gui.Canvas(Game.window.Width, Game.window.Height);
+            var c = Game.canvas = new Canvas(Game.window.Width, Game.window.Height);
 
             /*var test = c.Create<TextBox>();
             test.editable = true;
@@ -197,16 +231,18 @@ namespace Stopgap.Editor {
             cmdLine.size.y = unit.parse("0.05vh");
             cmdLine.size.x = unit.parse("0.9vw");
             cmdLine.pos.y = unit.parse("-0.4vh");
-            var vars = new Dictionary<string, GameObject>();
+
             cmdLine.OnInput += (t, e) => {
                 if (e.Key == OpenTK.Input.Key.Enter) {
                     var text = t.text;
                     t.RemoveText(0, text.Length);
                     Console.WriteLine(text);
-                    var g = new GameObject();
-                    g.AddComps(new MeshRenderer(Assets.GetMesh("sphere"), PBRMaterial.Default));
-                    g.EnterScene(Game.scene);
-                    vars[text] = g;
+
+                    if (text.Equals("play")) {
+                        Editor.play();
+                    } else if (text.Equals("edit")) {
+                        Editor.open();
+                    }
                 }
             };
         }

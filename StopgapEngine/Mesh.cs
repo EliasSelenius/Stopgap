@@ -11,17 +11,19 @@ using System.Security.Permissions;
 
 namespace Stopgap {
     [StructLayout(LayoutKind.Sequential)]
-    public struct Vertex {
+    public struct vertex {
         public vec3 pos;
-        public vec2 uv;
+        public vec2 texcoord;
         public vec3 normal;
 
-        public Vertex(vec3 p, vec2 u, vec3 n) {
-            pos = p; uv = u; normal = n;
+        public const int bytesize = 2 * vec3.bytesize + vec2.bytesize;
+
+        public vertex(vec3 p, vec2 u, vec3 n) {
+            pos = p; texcoord = u; normal = n;
         }
 
-        public Vertex Lerp(Vertex other, float time) {
-            return new Vertex(pos.lerp(other.pos, time), uv.lerp(other.uv, time), normal.lerp(other.normal, time));
+        public vertex lerp(vertex other, float time) {
+            return new vertex(pos.lerp(other.pos, time), texcoord.lerp(other.texcoord, time), normal.lerp(other.normal, time));
         }
     }
 
@@ -29,10 +31,10 @@ namespace Stopgap {
     public class Mesh {
 
         private Vertexarray vao;
-        private Buffer<Vertex> vbo;
+        private Buffer<vertex> vbo;
         private Buffer<uint> ebo;
 
-        public readonly List<Vertex> vertices;
+        public readonly List<vertex> vertices;
         public readonly List<uint> indices;
 
         public bool IsInitialized => vao != null;
@@ -61,11 +63,11 @@ namespace Stopgap {
         }
 
         public struct Triangle {
-            public readonly Vertex v1, v2, v3;
+            public readonly vertex v1, v2, v3;
             public readonly uint i1, i2, i3;
 
 
-            public Triangle(Vertex v1, Vertex v2, Vertex v3, uint i1, uint i2, uint i3) {
+            public Triangle(vertex v1, vertex v2, vertex v3, uint i1, uint i2, uint i3) {
                 this.v1 = v1; this.v2 = v2; this.v3 = v3;
                 this.i1 = i1; this.i2 = i2; this.i3 = i3;
             }
@@ -77,11 +79,11 @@ namespace Stopgap {
         }
 
         public Mesh() {
-            vertices = new List<Vertex>();
+            vertices = new List<vertex>();
             indices = new List<uint>();
         }
 
-        public Mesh(IEnumerable<Vertex> verts, IEnumerable<uint> indc) {
+        public Mesh(IEnumerable<vertex> verts, IEnumerable<uint> indc) {
             vertices = verts.ToList();
             indices = indc.ToList();
         }
@@ -97,7 +99,7 @@ namespace Stopgap {
 
             vao = new Vertexarray();
 
-            vbo = new Buffer<Vertex>();
+            vbo = new Buffer<vertex>();
             vbo.bufferdata(vertices.ToArray(), OpenTK.Graphics.OpenGL4.BufferUsageHint.StaticDraw);
 
             ebo = new Buffer<uint>();
@@ -126,8 +128,8 @@ namespace Stopgap {
         }
 
 
-        public Vertex VertexFurthestAwayFromPivot() {
-            Vertex res = this.vertices[0];
+        public vertex VertexFurthestAwayFromPivot() {
+            vertex res = this.vertices[0];
             for(int i = 1; i < this.vertices.Count; i++) {
                 if (res.pos.sqlength < this.vertices[i].pos.sqlength) {
                     res = vertices[i];
@@ -147,13 +149,13 @@ namespace Stopgap {
             // TODO: implement
         }
 
-        public void Mutate(Func<Vertex, Vertex> func) {
+        public void Mutate(Func<vertex, vertex> func) {
             for (int i = 0; i < vertices.Count; i++) {
                 vertices[i] = func(vertices[i]);
             }
         }
 
-        public void AddVertex(vec3 p, vec2 u, vec3 n) => vertices.Add(new Vertex(p, u, n));
+        public void AddVertex(vec3 p, vec2 u, vec3 n) => vertices.Add(new vertex(p, u, n));
 
         public void AddTriangle(uint a, uint b, uint c) {
             indices.Add(a);
@@ -177,11 +179,11 @@ namespace Stopgap {
             indices.CopyTo(ind);
             indices.Clear();
 
-            var vex = new Vertex[vertices.Count];
+            var vex = new vertex[vertices.Count];
             vertices.CopyTo(vex);
             vertices.Clear();
 
-            void _vertex(Vertex v) {
+            void _vertex(vertex v) {
                 var i = vertices.IndexOf(v);
                 if (i == -1) {
                     vertices.Add(v);
@@ -196,7 +198,7 @@ namespace Stopgap {
                      i2 = ind[i + 1],
                      i3 = ind[i + 2];
 
-                Vertex v1 = vex[i1],
+                vertex v1 = vex[i1],
                        v2 = vex[i2],
                        v3 = vex[i3];
 
@@ -208,9 +210,9 @@ namespace Stopgap {
                     o---o---o
                  v1    vm1    v2  */
                 
-                Vertex vm1 = v1.Lerp(v2, .5f),
-                       vm2 = v1.Lerp(v3, .5f),
-                       vm3 = v2.Lerp(v3, .5f);
+                vertex vm1 = v1.lerp(v2, .5f),
+                       vm2 = v1.lerp(v3, .5f),
+                       vm3 = v2.lerp(v3, .5f);
 
                 // triangle 1 (lower left)
                 _vertex(v1); _vertex(vm1); _vertex(vm2);
@@ -231,7 +233,7 @@ namespace Stopgap {
         private vec3 GenNormal(uint a, uint b, uint c) => GenNormal((int)a, (int)b, (int)c);
         private vec3 GenNormal(int a, int b, int c) => GenNormal(vertices[a], vertices[b], vertices[c]);
 
-        private static vec3 GenNormal(Vertex a, Vertex b, Vertex c) {
+        private static vec3 GenNormal(vertex a, vertex b, vertex c) {
             var dir1 = a.pos - c.pos;
             var dir2 = b.pos - c.pos;
             return dir1.cross(dir2);
@@ -332,7 +334,7 @@ namespace Stopgap {
                 10,1,6 ,11,0,9 ,2,11,9 ,5,2,9 ,11,2,7
             };
 
-            var m = new Mesh(verts.Select(x => new Vertex(x, vec2.zero, vec3.unity)), ind);
+            var m = new Mesh(verts.Select(x => new vertex(x, vec2.zero, vec3.unity)), ind);
             m.GenNormals();
             return m;
         }
@@ -340,42 +342,42 @@ namespace Stopgap {
         public static Mesh GenCube() {
             const float k = 0.5f;
             const float n = -k;
-            var verts = new Vertex[] {
+            var verts = new vertex[] {
                 // front side
-                new Vertex(new vec3(n,n,n), new vec2(), new vec3()),
-                new Vertex(new vec3(k,n,n), new vec2(), new vec3()),
-                new Vertex(new vec3(n,k,n), new vec2(), new vec3()),
-                new Vertex(new vec3(k,k,n), new vec2(), new vec3()),
+                new vertex(new vec3(n,n,n), new vec2(), new vec3()),
+                new vertex(new vec3(k,n,n), new vec2(), new vec3()),
+                new vertex(new vec3(n,k,n), new vec2(), new vec3()),
+                new vertex(new vec3(k,k,n), new vec2(), new vec3()),
 
                 // back side
-                new Vertex(new vec3(n,n,k), new vec2(), new vec3()),
-                new Vertex(new vec3(k,n,k), new vec2(), new vec3()),
-                new Vertex(new vec3(n,k,k), new vec2(), new vec3()),
-                new Vertex(new vec3(k,k,k), new vec2(), new vec3()),
+                new vertex(new vec3(n,n,k), new vec2(), new vec3()),
+                new vertex(new vec3(k,n,k), new vec2(), new vec3()),
+                new vertex(new vec3(n,k,k), new vec2(), new vec3()),
+                new vertex(new vec3(k,k,k), new vec2(), new vec3()),
 
                 // right side
-                new Vertex(new vec3(n,n,n), new vec2(), new vec3()),
-                new Vertex(new vec3(n,k,n), new vec2(), new vec3()),
-                new Vertex(new vec3(n,n,k), new vec2(), new vec3()),
-                new Vertex(new vec3(n,k,k), new vec2(), new vec3()),
+                new vertex(new vec3(n,n,n), new vec2(), new vec3()),
+                new vertex(new vec3(n,k,n), new vec2(), new vec3()),
+                new vertex(new vec3(n,n,k), new vec2(), new vec3()),
+                new vertex(new vec3(n,k,k), new vec2(), new vec3()),
 
                 // left side
-                new Vertex(new vec3(k,n,n), new vec2(), new vec3()),
-                new Vertex(new vec3(k,n,k), new vec2(), new vec3()),
-                new Vertex(new vec3(k,k,n), new vec2(), new vec3()),
-                new Vertex(new vec3(k,k,k), new vec2(), new vec3()),
+                new vertex(new vec3(k,n,n), new vec2(), new vec3()),
+                new vertex(new vec3(k,n,k), new vec2(), new vec3()),
+                new vertex(new vec3(k,k,n), new vec2(), new vec3()),
+                new vertex(new vec3(k,k,k), new vec2(), new vec3()),
 
                 // top side
-                new Vertex(new vec3(n,k,n), new vec2(), new vec3()),
-                new Vertex(new vec3(k,k,n), new vec2(), new vec3()),
-                new Vertex(new vec3(k,k,k), new vec2(), new vec3()),
-                new Vertex(new vec3(n,k,k), new vec2(), new vec3()),
+                new vertex(new vec3(n,k,n), new vec2(), new vec3()),
+                new vertex(new vec3(k,k,n), new vec2(), new vec3()),
+                new vertex(new vec3(k,k,k), new vec2(), new vec3()),
+                new vertex(new vec3(n,k,k), new vec2(), new vec3()),
 
                 // bottom side
-                new Vertex(new vec3(n,n,n), new vec2(), new vec3()),
-                new Vertex(new vec3(k,n,n), new vec2(), new vec3()),
-                new Vertex(new vec3(k,n,k), new vec2(), new vec3()),
-                new Vertex(new vec3(n,n,k), new vec2(), new vec3()),
+                new vertex(new vec3(n,n,n), new vec2(), new vec3()),
+                new vertex(new vec3(k,n,n), new vec2(), new vec3()),
+                new vertex(new vec3(k,n,k), new vec2(), new vec3()),
+                new vertex(new vec3(n,n,k), new vec2(), new vec3()),
 
             };
             var ind = new uint[] {
@@ -491,11 +493,11 @@ namespace Stopgap {
         }
 
         public static Mesh GenQuad() {
-            return new Mesh(new Vertex[] {
-                new Vertex((-.5f, -.5f, 0f), (0f, 0f), vec3.unitz),
-                new Vertex((.5f, -.5f, 0f), (1f, 0f), vec3.unitz),
-                new Vertex((-.5f, .5f, 0f), (0f, 1f), vec3.unitz),
-                new Vertex((.5f, .5f, 0f), (1f, 1f), vec3.unitz)
+            return new Mesh(new vertex[] {
+                new vertex((-.5f, -.5f, 0f), (0f, 0f), vec3.unitz),
+                new vertex((.5f, -.5f, 0f), (1f, 0f), vec3.unitz),
+                new vertex((-.5f, .5f, 0f), (0f, 1f), vec3.unitz),
+                new vertex((.5f, .5f, 0f), (1f, 1f), vec3.unitz)
             },
             new uint[] { 
                 0, 1, 2,
