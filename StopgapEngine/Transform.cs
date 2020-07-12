@@ -33,7 +33,14 @@ namespace Stopgap {
         }
 
 
-        public Matrix4 matrix => Matrix4.CreateScale(scale.ToOpenTKVec()) * Matrix4.CreateFromQuaternion(rotation) * Matrix4.CreateTranslation(position.ToOpenTKVec());
+        public Matrix4 matrix {
+            get => Matrix4.CreateScale(scale.ToOpenTKVec()) * Matrix4.CreateFromQuaternion(rotation) * Matrix4.CreateTranslation(position.ToOpenTKVec());
+            set {
+                position = value.ExtractTranslation().ToNumsVec();
+                scale = value.ExtractScale().ToNumsVec();
+                rotation = value.ExtractRotation();
+            }
+        }
 
         public vec3 forward => matrix.Row2.Xyz.ToNumsVec();
         public vec3 back => -forward;

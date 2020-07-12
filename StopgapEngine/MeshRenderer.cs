@@ -46,9 +46,10 @@ namespace Stopgap {
         }
     }
 
-    public class AdvMeshTest : Component, IRenderable {
+    public class AdvMeshRenderer : Component, IRenderable {
         public AdvMesh mesh;
         public void render() {
+            // TODO: fix this:
             Game.renderer.default_shader.set_mat4("model", gameObject.model_matrix);
             mesh.render();
         }

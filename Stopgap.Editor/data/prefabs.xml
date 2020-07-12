@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<assets>
+  <prefab name="test-prefab">
+    <transform>
+      <position>0 0 0</position>
+      <scale>1 1 1</scale>
+      <rotation>0 0 0 1</rotation>
+    </transform>
+    <components>
+      <Stopgap.Rigidbody>
+        <Mass>1.0</Mass>
+      </Stopgap.Rigidbody>
+      <MeshRenderer>
+        <mesh>cube-mesh</mesh>
+      </MeshRenderer>
+    </components>
+    <prefab></prefab>
+  </prefab>
+
+  <ShaderProgram name="hello">
+    <vertex_path></vertex_path>
+  </ShaderProgram>
+  
+
+</assets>

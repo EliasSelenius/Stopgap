@@ -1,14 +1,11 @@
 ﻿using Nums;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Xml;
 
 namespace Stopgap {
@@ -16,10 +13,33 @@ namespace Stopgap {
 
         private readonly List<Geometry> geometries = new List<Geometry>();
         private readonly List<Material> materials = new List<Material>();
+        private readonly XmlElement scene;
+
+        private static readonly mat3 m = new mat3(
+                    1, 0, 0,
+                    0, 0, 1,
+                    0, -1, 0
+                    );
+
+        private static vec3 correct_axis(vec3 v) {
+            // TODO: only do this when z-axis is up
+            //return m * v;
+            //return v.xzy * new vec3(1, 1, -1);
+            return v;
+        }
 
         public Collada(XmlDocument doc) {
 
             var root = doc["COLLADA"];
+
+            // asset
+            var asset_xml = root["asset"];
+            var up_axis = asset_xml["up_axis"].InnerText;
+
+
+            // scenes
+            scene = root["library_visual_scenes"]["visual_scene"];
+
 
             // geometry
             var lib_geom = root["library_geometries"];
@@ -35,16 +55,67 @@ namespace Stopgap {
             }
         }
 
-        public AdvMesh to_gameobject() {
-            var meshes = geometries.Select(x => x.genMesh());
+        public Geometry get_geometry(string id) => geometries.Find(x => x.id.Equals(id));
+        public Material get_material(string id) => materials.Find(x => x.id.Equals(id));
+
+        public List<GameObject> to_gameobject() {
+            var geoms = new Dictionary<string, AdvMesh>();
+            foreach (var g in geometries) {
+                geoms.Add(g.id, g.genMesh());
+            }
+
+            GameObject node(XmlElement xml) {
+                var g = new GameObject();
 
 
-            return meshes.ElementAt(9);
+                var fs = xml["matrix"].InnerText.Split(' ').Select(x => float.Parse(x)).ToArray();
+
+                var m = new Matrix4();
+                m.M11 = fs[0];
+                m.M12 = fs[1];
+                m.M13 = fs[2];
+                m.M14 = fs[3];
+
+                m.M21 = fs[4];
+                m.M22 = fs[5];
+                m.M23 = fs[6];
+                m.M24 = fs[7];
+
+                m.M31 = fs[8];
+                m.M32 = fs[9];
+                m.M33 = fs[10];
+                m.M34 = fs[11];
+
+                m.M41 = fs[12];
+                m.M42 = fs[13];
+                m.M43 = fs[14];
+                m.M44 = fs[15];
+                m.Transpose();
+                g.transform.matrix = m;
+
+                g.transform.position = correct_axis(g.transform.position);
+
+                g.AddComp(new AdvMeshRenderer { mesh = geoms[xml["instance_geometry"].GetAttribute("url").TrimStart('#')] });
+
+
+                foreach (var child in xml.SelectNodes("*[@type='NODE']")) {
+                    g.AddChild(node(child as XmlElement));
+                }
+                return g;
+            }
+
+            var res = new List<GameObject>();
+            var nodes = scene.SelectNodes("*[@type='NODE']");
+            foreach (var item in nodes) {
+                res.Add(node(item as XmlElement));
+            }
+
+            return res;
         }
 
         public class Geometry {
             readonly Collada collada;
-            readonly string id, name;
+            public readonly string id, name;
 
             Dictionary<string, Source> sources = new Dictionary<string, Source>();
             TriangleCollection[] triangles;
@@ -86,7 +157,6 @@ namespace Stopgap {
                 public readonly (Source source, int offset) normal_input;
                 public readonly (Source source, int offset) texcoord_input;
                 
-
                 public string material_name;
 
                 public vertexindices[] indices;
@@ -168,7 +238,15 @@ namespace Stopgap {
                 var mesh = new AdvMesh();
 
                 int add_vertex(vertex v) {
-                    if (mesh.vertices.Contains(v)) return mesh.vertices.IndexOf(v);
+                    //if (mesh.vertices.Contains(v)) return mesh.vertices.IndexOf(v);
+                    //var index = mesh.vertices.IndexOf(v);
+                    //if (index != -1) return index;
+                    
+
+                    
+                    v.normal = correct_axis(v.normal);
+                    v.pos = correct_axis(v.pos);
+
                     mesh.vertices.Add(v);
                     return mesh.vertices.Count - 1;
                 }
@@ -189,7 +267,7 @@ namespace Stopgap {
                             ));
                     }
 
-                    mesh.add_triangles(collada.get_material(trcollection.material_name).to_material(), indices);
+                    mesh.add_triangles(collada.get_material(trcollection.material_name).pbrMaterial, indices);
                 }
                 mesh.bufferdata();
 
@@ -197,21 +275,33 @@ namespace Stopgap {
             }
         }
 
-        public Material get_material(string id) => materials.Find(x => x.id.Equals(id));
 
         public class Material {
             public readonly string id, name;
 
+            public readonly PBRMaterial pbrMaterial;
+
             internal Material(XmlElement xml) {
                 id = xml.GetAttribute("id");
                 name = xml.GetAttribute("name");
+
+                var effectId = xml["instance_effect"].GetAttribute("url").TrimStart('#');
+
+                var lambert_xml = xml.OwnerDocument.DocumentElement["library_effects"].SelectSingleNode($"*[@id='{effectId}']")["profile_COMMON"]["technique"]["lambert"];
+
+                vec4 parse_color(string t) {
+                    var n = t.Split(' ').Select(x => float.Parse(x));
+                    return new vec4(n.ElementAt(0), n.ElementAt(1), n.ElementAt(2), n.ElementAt(3));
+                }
+
+                pbrMaterial = new PBRMaterial {
+                    albedo = parse_color(lambert_xml["diffuse"].InnerText).xyz,
+                    emission = parse_color(lambert_xml["emission"].InnerText).xyz,
+                    roughness = 1 - float.Parse(lambert_xml["reflectivity"].InnerText)
+                };
+
             }
 
-            public Stopgap.Material to_material() {
-                return new PBRMaterial {
-                    albedo = (math.range(0, 1), math.range(0, 1), math.range(0, 1))
-                };
-            }
         }
 
 

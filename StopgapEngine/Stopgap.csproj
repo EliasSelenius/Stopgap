@@ -105,7 +105,7 @@
     <Compile Include="Gui\Unit.cs" />
     <Compile Include="ImageeffectBuffers.cs" />
     <Compile Include="Input.cs" />
-    <Compile Include="ObjectPool.cs" />
+    <Compile Include="Objectpool.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="Renderer.cs" />
     <Compile Include="Script\ScriptParser.cs" />

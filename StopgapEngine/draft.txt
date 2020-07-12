@@ -22,6 +22,18 @@ engine features:
 		must transform correctly
 
 
+
+xml assets
+ - Scenes 
+ - Prefabs 
+ - Canvas
+ - skyboxes
+ - material
+ - shader programs
+
+
+
+
 optimalization techniques:
 	- multithreading
 	- async programing pattern

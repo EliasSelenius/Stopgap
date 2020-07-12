@@ -58,6 +58,8 @@
     <None Include="data\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="data\models\Ships.bin" />
+    <None Include="data\models\Ships.gltf" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -70,6 +72,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="data\canvas.xml" />
+    <Content Include="data\prefabs.xml" />
     <Content Include="data\textures\noise.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

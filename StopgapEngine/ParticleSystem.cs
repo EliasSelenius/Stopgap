@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Glow;
 using Nums;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
 
 namespace Stopgap {
 
@@ -62,8 +61,11 @@ namespace Stopgap {
                 var p = particles[i];
                 p.pos += p.velocity * Game.deltaTime;
                 particles[i] = p;
-                if (p.elapsedTime > lifetime) { 
+                if (p.elapsedTime > lifetime) {
                     particles.RemoveAt(i);
+                    
+                    //particles.Remove(p);
+                    //Objectpool.recycle(p);
                 }
             }
 
@@ -81,9 +83,9 @@ namespace Stopgap {
         }
 
         private Particle getNewParticle() {
-            var p = newParticle?.Invoke() ?? new Particle();
+            var p = newParticle?.Invoke() ?? new Particle(); // Objectpool<Particle>.get();
 
-            p.pos = gameObject.transform.position + (startPos?.Invoke() ?? p.pos);
+            p.pos = gameObject.transform.position + (startPos?.Invoke() ?? vec3.zero);//p.pos);
             p.scale = (startScale?.Invoke() ?? p.scale);
             p.rotation = (startRotation?.Invoke() ?? p.rotation);
             p.velocity = (startVelocity?.Invoke() ?? p.velocity);

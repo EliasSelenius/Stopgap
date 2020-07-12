@@ -12,6 +12,8 @@ using System.Diagnostics.PerformanceData;
 using System.Xml;
 using System.Runtime.InteropServices;
 
+
+
 namespace StopgapEditor {
     class Program {
 
@@ -20,7 +22,6 @@ namespace StopgapEditor {
             Game.onLoad = () => {
 
                 Game.SetScene(new Scene());
-
 
                 // test multi-material mesh 
                 {
@@ -48,10 +49,11 @@ namespace StopgapEditor {
                     mesh.add_triangles(mat , 1, 2, 3);
 
                     mesh.bufferdata();
-                    var obj = Game.scene.spawn(new AdvMeshTest { mesh = mesh } /*, new Billboard(PBRMaterial.Default)*/);
+                    var obj = Game.scene.spawn(new AdvMeshRenderer { mesh = mesh } /*, new Billboard(PBRMaterial.Default)*/);
                     obj.transform.position = (-30, 0, 30);
                     obj.transform.scale *= 10;
                 }
+
 
 
                 // test canvas xml import
@@ -68,9 +70,14 @@ namespace StopgapEditor {
                     xml.Load("data/models/Ships2.dae"); //untitled.dae");
                     var collada = new Collada(xml);
 
-                    var o = Game.scene.spawn(new AdvMeshTest { mesh = collada.to_gameobject() });
-                    o.transform.scale *= 10;
-                    o.transform.position = (-50, 0, -20);
+                    var gs = collada.to_gameobject();
+                    foreach (var item in gs) {
+                        item.transform.position *= 10;
+                        item.transform.scale *= 10;
+
+                        item.EnterScene(Game.scene);
+                    }
+
                 }
 
                 

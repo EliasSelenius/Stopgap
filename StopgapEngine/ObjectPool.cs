@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,30 +7,27 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Stopgap {
-    public class ObjectPool<T> where T : class, new() {
+    public static class Objectpool {
+        public static void recycle<T>(T item) where T : class, new() => Objectpool<T>.recycle(item);
+    }
 
-        private readonly List<T> unused = new List<T>();
+    public static class Objectpool<T> where T : class, new() {
 
-        public void pre_alloc(int count) {
+        private static readonly Stack<T> pool = new Stack<T>();
+
+        public static T get() {
+            if (pool.Any()) return pool.Pop();
+            return new T();
+        }
+
+        public static void recycle(T item) {
+            pool.Push(item);
+        }
+
+        public static void alloc(int count) {
             for (int i = 0; i < count; i++) {
-                return_object(@new());
+                pool.Push(new T());
             }
         }
-
-        private T @new() => new T();
-
-        public T get_object() {
-            T res = null;
-            if (unused.Any()) {
-                res = unused[0];
-                unused.Remove(res);
-            }
-            return res ?? @new();
-        }
-
-        public void return_object(T t) {
-            unused.Add(t);
-        }
-
     }
 }
