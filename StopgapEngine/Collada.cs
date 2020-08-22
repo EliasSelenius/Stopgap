@@ -58,14 +58,14 @@ namespace Stopgap {
         public Geometry get_geometry(string id) => geometries.Find(x => x.id.Equals(id));
         public Material get_material(string id) => materials.Find(x => x.id.Equals(id));
 
-        public List<GameObject> to_gameobject() {
+        public Dictionary<string, Prefab> toPrefabs() {
             var geoms = new Dictionary<string, AdvMesh>();
             foreach (var g in geometries) {
                 geoms.Add(g.id, g.genMesh());
             }
 
-            GameObject node(XmlElement xml) {
-                var g = new GameObject();
+            Prefab node(XmlElement xml) {
+                var g = new Prefab();
 
 
                 var fs = xml["matrix"].InnerText.Split(' ').Select(x => float.Parse(x)).ToArray();
@@ -95,19 +95,28 @@ namespace Stopgap {
 
                 g.transform.position = correct_axis(g.transform.position);
 
-                g.AddComp(new AdvMeshRenderer { mesh = geoms[xml["instance_geometry"].GetAttribute("url").TrimStart('#')] });
+                //g.AddComp(new AdvMeshRenderer { mesh = geoms[xml["instance_geometry"].GetAttribute("url").TrimStart('#')] });
+
+                var inst_geom = xml["instance_geometry"];
+                if (inst_geom != null) {
+                    g.addComp<AdvMeshRenderer>(new Dictionary<string, object> {
+                        { "mesh", geoms[inst_geom.GetAttribute("url").TrimStart('#')] }
+                    });
+                }
 
 
                 foreach (var child in xml.SelectNodes("*[@type='NODE']")) {
-                    g.AddChild(node(child as XmlElement));
+                    //g.AddChild(node(child as XmlElement));
+                    g.children.Add(node(child as XmlElement));
                 }
                 return g;
             }
 
-            var res = new List<GameObject>();
+            var res = new Dictionary<string, Prefab>();
             var nodes = scene.SelectNodes("*[@type='NODE']");
             foreach (var item in nodes) {
-                res.Add(node(item as XmlElement));
+                var x = (XmlElement)item;
+                res.Add(x.GetAttribute("id"), node(x));
             }
 
             return res;
@@ -297,7 +306,7 @@ namespace Stopgap {
                 pbrMaterial = new PBRMaterial {
                     albedo = parse_color(lambert_xml["diffuse"].InnerText).xyz,
                     emission = parse_color(lambert_xml["emission"].InnerText).xyz,
-                    roughness = 1 - float.Parse(lambert_xml["reflectivity"].InnerText)
+                    roughness = 1 - float.Parse(lambert_xml["reflectivity"]?.InnerText ?? "0")
                 };
 
             }

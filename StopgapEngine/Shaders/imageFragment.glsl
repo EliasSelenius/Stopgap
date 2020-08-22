@@ -8,10 +8,15 @@ in vec2 uv;
 
 out vec4 FragColor;
 
+vec4 reztex(in sampler2D buf, float rez) {
+	return texture(buf, floor(uv * rez) / rez);
+}
+
 void main() {
 	vec4 color = texture(colorBuffer, uv);
+
 	vec4 bColor = texture(brightnessBuffer, uv);
-	
+
 	color += bColor;
 
 	// tone mapping (HDR -> LDR):

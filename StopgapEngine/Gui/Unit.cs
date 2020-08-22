@@ -13,7 +13,6 @@ namespace Stopgap.Gui {
     /*
         different units:
             - ndc [-1..1]
-            - px [0..size]
             - vh  [0..1]
             - vw [0..1]
 
@@ -22,7 +21,6 @@ namespace Stopgap.Gui {
 
     public enum UnitType {
         ndc,
-        pixels,
         viewHeight,
         viewWidth
     }
@@ -40,9 +38,8 @@ namespace Stopgap.Gui {
         public float get_ndc(Element element, bool vertical) {
             return type switch {
                 UnitType.ndc => value,
-                UnitType.pixels => value / (vertical ? element.canvas.height : element.canvas.width) * 2 - 1,
-                UnitType.viewHeight => (value * 2) * (vertical ? 1 : element.canvas.aspectRatio),
-                UnitType.viewWidth => (value * 2) / (vertical ? element.canvas.aspectRatio : 1),
+                //UnitType.viewHeight => (value * 2) * (vertical ? 1 : element.canvas.aspectRatio),
+                //UnitType.viewWidth => (value * 2) / (vertical ? element.canvas.aspectRatio : 1),
                 _ => throw new Exception("")
             };
         }
@@ -50,12 +47,11 @@ namespace Stopgap.Gui {
         public static unit parse(string text) {
             UnitType t;
             if (text.EndsWith("ndc")) t = UnitType.ndc;
-            else if (text.EndsWith("px")) t = UnitType.pixels;
             else if (text.EndsWith("vh")) t = UnitType.viewHeight;
             else if (text.EndsWith("vw")) t = UnitType.viewWidth;
             else throw new Exception("");
 
-            var i = math.max(text.IndexOf("ndc"), math.max(text.IndexOf("px"), math.max(text.IndexOf("vh"), text.IndexOf("vw"))));
+            var i = math.max(text.IndexOf("ndc"), math.max(text.IndexOf("vh"), text.IndexOf("vw")));
 
             var num = float.Parse(text.Substring(0, (int)i));
             return new unit(t, num);

@@ -20,21 +20,12 @@ namespace Stopgap.Gui {
 
 
 
-        public int width { get; private set; }
-        public int height { get; private set; }
-        public void resize(int w, int h) {
-            width = w; height = h;
-        }
-
         public Element focusedElement { get; internal set; } = null;
-        public float aspectRatio => (float)height / width;
+        //public float aspectRatio => (float)height / width;
 
         private readonly List<Element> rootElements = new List<Element>();
         
-        public Canvas(int w, int h) {
-            width = w;
-            height = h;
-        }
+        public Canvas() { }
 
         public Canvas(XmlElement canvas) {
 
@@ -45,8 +36,8 @@ namespace Stopgap.Gui {
             }
             int get_int(XmlElement el, string name, string defvalue) => int.Parse(get_attrib(el, name, defvalue));
 
-            width = get_int(canvas, "width", Game.window.Width.ToString());
-            height = get_int(canvas, "height", Game.window.Height.ToString());
+            //width = get_int(canvas, "width", Game.window.Width.ToString());
+            //height = get_int(canvas, "height", Game.window.Height.ToString());
 
             var element_types = new Dictionary<string, Func<XmlElement, Element>>() {
                 { "element", xml => {

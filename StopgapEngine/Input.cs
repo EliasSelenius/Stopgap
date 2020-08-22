@@ -14,7 +14,8 @@ namespace Stopgap {
     public static class Input {
         public static vec2 Wasd => new vec2(KeyAxis(Key.D, Key.A), KeyAxis(Key.W, Key.S));
 
-        public static vec2 MouseDelta => MousePos - (IsFixedMouse ? screenCenter : PrevMousePos);
+        //public static vec2 MouseDelta => MousePos - (IsFixedMouse ? screenCenter : PrevMousePos);
+        public static vec2 MouseDelta { get; private set; }
         public static vec2 MousePos { get; private set; }
         public static vec2 MousePos_ndc {
             get {
@@ -100,29 +101,40 @@ namespace Stopgap {
 
         public static void FixedMouse(bool v) {
             fixedmouse = v;
+            ensureMousePos();
             //Game.window.CursorVisible = !fixedmouse;
+        }
+
+        public static void hideMouse(bool b) {
+            Game.window.CursorVisible = !b;
         }
 
         private static void Window_MouseMove(object sender, MouseMoveEventArgs e) {
             PrevMousePos = MousePos;
             MousePos = new vec2(e.X, e.Y);
+            MouseDelta = MousePos - (IsFixedMouse ? screenCenter : PrevMousePos);
+        }
+
+        private static void ensureMousePos() {
+            if (IsFixedMouse) setMousePos(screenCenter);
+        }
+
+        public static void setMousePos(ivec2 pos) {
+            var p = Game.window.PointToScreen(new System.Drawing.Point(pos.x, pos.y));
+            Mouse.SetPosition(p.X, p.Y);
         }
 
         internal static void Update() {
             keyboard = Keyboard.GetState();
             mouse = Mouse.GetState();
+            ensureMousePos();
+        }
 
-            // reset data:
+        internal static void reset() {
             MouseWheelDelta = 0;
             LeftMousePressed = RightMousePressed = MiddelMousePressed = false;
 
             for (int i = 0; i < pressedStates.Count; i++) pressedStates[pressedStates.ElementAt(i).Key] = false;
-
-            if (IsFixedMouse) {
-                var c = screenCenter;
-                var p = Game.window.PointToScreen(new System.Drawing.Point(c.x, c.y));
-                Mouse.SetPosition(p.X, p.Y);
-            }
         }
 
         public static bool IsKeyDown(Key k) => keyboard.IsKeyDown(k);

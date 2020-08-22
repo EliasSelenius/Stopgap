@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using Nums;
 using JsonParser;
+using System.Collections.Specialized;
 
 namespace Stopgap {
     public class Transform {
@@ -67,6 +68,18 @@ namespace Stopgap {
             position = pos; scale = scl; rotation = rot;
         }
 
+        public void set(Transform transform) {
+            position = transform.position;
+            scale = transform.scale;
+            rotation = transform.rotation;
+        }
+
+        public void set(vec3 pos, vec3 scale, Quaternion rot) {
+            position = pos;
+            this.scale = scale;
+            rotation = rot;
+        }
+
         public void Translate(vec3 v) {
             position += v;
         }
@@ -89,6 +102,9 @@ namespace Stopgap {
             rotation = Quaternion.FromEulerAngles(euler.ToOpenTKVec()) * rotation;
         }
 
+        public void setRotation(vec3 euler) => rotation = Quaternion.FromEulerAngles(euler.ToOpenTKVec());
+        public void setRotation(vec3 axis, float angle) => rotation = Quaternion.FromAxisAngle(axis.ToOpenTKVec(), angle);
+        public void setRotation(Quaternion quat) => rotation = quat;
 
         public void LookIn(vec3 dir) => LookIn(dir, vec3.unity);
         public void LookIn(vec3 dir, vec3 up) {

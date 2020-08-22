@@ -15,6 +15,11 @@ namespace Stopgap {
         public OpenTK.Graphics.OpenGL4.PrimitiveType primitiveType;
 
 
+        public MeshRenderer() {
+            mesh = Assets.GetMesh("cube");
+            material = PBRMaterial.Default;
+            primitiveType = OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles;
+        }
 
         public MeshRenderer(Mesh m, Material mat) : this(m, mat, OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles) { }
 

@@ -12,6 +12,7 @@ using Glow;
 using Nums;
 using System.Threading;
 using OpenTK.Graphics;
+using Stopgap.Gui;
 
 namespace Stopgap {
 
@@ -65,25 +66,26 @@ namespace Stopgap {
         }
 
         private static void Window_Load(object sender, EventArgs e) {
-            Assets.Load();
-            
             
             renderer = new DefaultRenderer();
             //renderer = new DeferredRenderer();
+            Assets.Load();
             onLoad();
             CreateDebugGUI();
-            
+
             //collisons_thread.Start();
+
         }
 
         private static void CreateDebugGUI() {
 
-            var c = Game.canvas ??= new Gui.Canvas(window.Width, window.Height);
+            var c = Game.canvas ??= new Gui.Canvas();
 
+            
             // FPS display:
             var fpsd = c.Create<Gui.Textbox>();
-            fpsd.font_size = 0.25f;
-            fpsd.size = Gui.unit2.parse("0.1vw 0.03vh");
+            fpsd.font_size = 0.14f;
+            fpsd.size = Gui.unit2.parse("0.2vw 0.03vh");
             fpsd.pos = Gui.unit2.parse("-0.5vw 0.5vh");
             fpsd.anchor = Gui.Anchor.top_left;
             fpsd.draw_background = false;
@@ -93,14 +95,21 @@ namespace Stopgap {
         }
 
         private static void Window_UpdateFrame(object sender, FrameEventArgs e) {
-            if (scene != Editor.instance) {
+
+            if (Input.IsKeyPressed(OpenTK.Input.Key.F1)) {
+                if (Editor.is_open) Editor.play();
+                else Editor.open();
+            }
+            
+            if (!Editor.is_open) {
                 time += (deltaTime = (float)e.Time);
             }
             
+            Input.Update();
             canvas?.Update();
             scene.Update();
+            Input.reset();
             //scene.processCollisions();
-            Input.Update();
         }
 
 
@@ -117,7 +126,7 @@ namespace Stopgap {
             //BlurFilter.ReinitializeBuffers(Game.window.Width, Game.window.Height);
             BlurFilter.resize();
             renderer.OnWindowResize(window.Width, window.Height);
-            canvas.resize(window.Width, window.Height);
+            //canvas.resize(window.Width, window.Height);
         }
     }
 }

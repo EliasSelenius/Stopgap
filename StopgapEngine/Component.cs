@@ -55,13 +55,8 @@ namespace Stopgap {
         private void _update() {
             Update();
 
-            if (update_enumerator == null) {
-                update_enumerator = UpdateEnum();
-            } else {
-                if (!update_enumerator.MoveNext()) {
-                    update_enumerator = null;
-                }
-            }
+            if (update_enumerator == null) update_enumerator = UpdateEnum();
+            else if (!update_enumerator.MoveNext()) update_enumerator = null;
             
         }
 

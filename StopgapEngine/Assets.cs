@@ -11,6 +11,7 @@ using Glow;
 using JsonParser;
 
 using OpenTK.Graphics.OpenGL4;
+using System.Xml;
 
 namespace Stopgap {
     public static class Assets {
@@ -50,6 +51,10 @@ namespace Stopgap {
             return m;
         }
 
+        public static Prefab getPrefab(string name) {
+            return Prefabs[name];
+        }
+
         internal static void Load() {
             LoadObjs();
 
@@ -64,38 +69,61 @@ namespace Stopgap {
             CompileShadersFromConfig();
 
 
-
             LoadImages();
 
-            LoadPrefabs();
+            loadColladaFiles();
 
 
             // add some default meshes
-            var m = Mesh.GenIcosphere();
-            m.Subdivide(2);
-            m.Mutate(v => {
-                v.pos = v.pos.normalized();
-                return v;
-            });
-            m.GenNormals();
-         
+            {
+                var m = Mesh.GenIcosphere();
+                m.Subdivide(2);
+                m.Mutate(v => {
+                    v.pos = v.pos.normalized();
+                    return v;
+                });
+                m.GenNormals();
+                AddMesh("sphere", m);
+                AddMesh("cube", Mesh.GenCube());
+            }
 
-            AddMesh("sphere", m);
 
-            AddMesh("cube", Mesh.GenCube());
+            // load assets from xml files
+            loadXmlFiles();   
 
         }
+
+
+        private static void loadColladaFiles() {
+            foreach (var item in GetFiles("data/*.dae")) {
+                Log("Loading " + item.Name);
+                var d = new XmlDocument();
+                d.Load(item.FullName);
+                var c = new Collada(d);
+                var prfs = c.toPrefabs();
+                foreach (var pr in prfs) {
+                    Prefabs[pr.Key] = pr.Value;
+                }
+            }
+        }
+
+
+        private static void loadXmlFiles() {
+            foreach (var item in GetFiles("data/*.xml")) {
+                var xmldoc = new XmlDocument();
+                xmldoc.Load(item.FullName);
+                foreach (var elm in xmldoc.DocumentElement.ChildNodes) {
+                    var x = elm as XmlElement;
+                    if (x.Name.Equals("prefab")) Prefabs.Add(x.GetAttribute("name"), new Prefab(x));
+                }
+            }
+        }
+
+
 
         private static void LoadImages() {
             foreach (var item in GetFiles("data/textures/*.png")) {
                 Images.Add(item.Name, SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(item.FullName));
-            }
-        }
-
-        private static void LoadPrefabs() {
-            foreach (var item in GetFiles("data/prefabs/*.json")) {
-                var json = JsonParser.Json.FromFile(item.FullName) as JObject;
-                Prefabs.Add(json["name"] as JString, Prefab.Load(json));
             }
         }
 

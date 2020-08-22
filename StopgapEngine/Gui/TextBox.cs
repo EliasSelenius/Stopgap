@@ -100,7 +100,7 @@ namespace Stopgap.Gui {
         private void addQuadData(Quad quad, uint quadIndex, List<vec4> vertices, List<uint> indices) {
             void _addv(vec4 v) {
                 v.xy *= font_size;
-                v.x *= canvas.aspectRatio;
+                //v.x *= canvas.aspectRatio;
                 
                 v.xy += cursor;
                 vertices.Add(v);
@@ -139,7 +139,7 @@ namespace Stopgap.Gui {
                 addQuadData(quad, quadsCount, vertices, indices);
                 quadsCount++;
 
-                cursor.x += quad.glyph.advance * font_size * canvas.aspectRatio;
+                cursor.x += quad.glyph.advance * font_size;// * canvas.aspectRatio;
                 var next = i == quads.Count - 1 ? 0 : quads[i + 1].glyph.size.x;
                 if (cursor.x + next > hs.x) {
                     cursor.x = -hs.x;

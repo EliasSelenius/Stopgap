@@ -2,19 +2,29 @@
 <assets>
   <prefab name="test-prefab">
     <transform>
-      <position>0 0 0</position>
-      <scale>1 1 1</scale>
+      <position>0 0 -60</position>
+      <scale>5 6 7</scale>
       <rotation>0 0 0 1</rotation>
     </transform>
     <components>
       <Stopgap.Rigidbody>
         <Mass>1.0</Mass>
       </Stopgap.Rigidbody>
-      <MeshRenderer>
+      <Stopgap.MeshRenderer>
         <mesh>cube-mesh</mesh>
-      </MeshRenderer>
+      </Stopgap.MeshRenderer>
     </components>
-    <prefab></prefab>
+    <prefab>
+      <transform>
+        <position>1 1 1</position>
+        <scale>0.5 0.5 0.5</scale>
+      </transform>
+      <components>
+        <Stopgap.MeshRenderer>
+          <mesh></mesh>
+        </Stopgap.MeshRenderer>
+      </components>
+    </prefab>
   </prefab>
 
   <ShaderProgram name="hello">

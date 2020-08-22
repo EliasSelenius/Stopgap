@@ -9,18 +9,27 @@ using Nums;
 namespace Stopgap {
     public class CamFlyController : Component {
 
+        public float smooth = 0;
+
         public override void Start() {
             //Input.FixedMouse(true);
         }
+
+        float x_angle, y_angle;
 
         protected override void Update() {
 
 
             if (Input.MouseRightButtonDown) {
                 Input.FixedMouse(true);
+                Input.hideMouse(true);
                 var zrotinput = -Input.KeyAxis(OpenTK.Input.Key.Q, OpenTK.Input.Key.E) / 10f;
-                transform.Rotate(vec3.unity, -Input.MouseDelta.x / 100f);
-                transform.Rotate(transform.right, Input.MouseDelta.y / 100f);
+                //transform.Rotate(vec3.unity, -Input.MouseDelta.x / 100f);
+                //transform.Rotate(transform.right, Input.MouseDelta.y / 100f);
+                x_angle = math.clamp(x_angle + Input.MouseDelta.y / 100f, -math.half_pi, math.half_pi);
+                y_angle += -Input.MouseDelta.x / 100f;
+                transform.setRotation(vec3.unity, y_angle);
+                transform.Rotate(transform.right, x_angle);
 
                 float speed = .4f;
                 if (Input.IsKeyDown(OpenTK.Input.Key.LShift)) {
@@ -42,6 +51,7 @@ namespace Stopgap {
 
             } else {
                 Input.FixedMouse(false);
+                Input.hideMouse(false);
             }
 
         }

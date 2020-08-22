@@ -1,158 +1,152 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Xml;
 using JsonParser;
 using Nums;
+using OpenTK;
 
 namespace Stopgap {
     public class Prefab {
 
-        private readonly Transform transform;
-        private readonly Dictionary<Type, object[]> components = new Dictionary<Type, object[]>();
-        private readonly List<Prefab> children = new List<Prefab>();
+        public readonly Transform transform = new Transform();
+        //private readonly Dictionary<Type, object[]> components = new Dictionary<Type, object[]>();
+        private readonly List<Comp> components = new List<Comp>();
+        public readonly List<Prefab> children = new List<Prefab>();
 
-        public Prefab(Transform t) {
-            transform = t;
-        }
 
-        public static Prefab Load(JObject json) {
+        class Comp {
+            public readonly Type type;
+            public readonly Dictionary<string, object> fields = new Dictionary<string, object>();
 
-            // Transform:
-            Transform t;
-            if (json.ContainsKey("transform")) {
-                t = Transform.FromJson(json["transform"] as JObject);
-            } else t = new Transform();
-
-            var res = new Prefab(t);
-
-            // Components
-            if (json.ContainsKey("components")) {
-                foreach (var item in json["components"] as JArray) {
-                    var o = item as JObject;
-                    var type = Type.GetType(o["type"] as JString);
-                    if (o.ContainsKey("args")) {
-                        var jargs = o["args"] as JArray;
-                        var args = new List<object>();
-                        foreach (var arg in jargs) {
-                            var resarg = arg.ToObject();
-                            if (arg.IsString) {
-                                var str = (string)(arg as JString);
-                                if (str.StartsWith("@")) {
-                                    // preprocessing directive:
-                                    str = str.Substring(1);
-                                    resarg = PreProcessingDirective(str);
-                                }
-                            } else if (arg.IsArray) {
-
-                            }
-                            args.Add(resarg);
-                        }
-                        res.AddComp(type, args.ToArray());
-                    } else res.AddComp(type);
-                }
+            public Comp(Type t, Dictionary<string, object> fs) {
+                type = t;
+                fields = fs;
             }
 
-
-            // Children:
-            if (json.ContainsKey("children")) {
-                foreach (var childjson in json["children"] as JArray) {
-                    res.AddChild(Load(childjson as JObject));
+            public Component create() {
+                var res = type.GetConstructor(Array.Empty<Type>()).Invoke(null) as Component;
+                foreach (var item in fields) {
+                    type.GetField(item.Key).SetValue(res, item.Value);
                 }
+                return res;
             }
-
-            return res;
         }
 
-        private static (Type, object[]) loadComponent(JObject jobj) {
+        public void addComp<T>(Dictionary<string, object> fields) where T : Component {
+            components.Add(new Comp(typeof(T), fields));
+        }
 
-            if (jobj.ContainsKey("args")) {
-                var jargs = jobj["args"] as JArray;
-                var args = new List<object>();
-                foreach (var jarg in jargs) {
-                    if (jarg.IsArray) {
-                        var a = jarg as JArray;
+        public Prefab() { }
 
+        public Prefab(XmlElement xml) {
+            bool child(XmlElement x, string c, out XmlElement n) => 
+                (n = x[c]) != null;
+            vec3 asVec3(string str) {
+                var fs = str.Split(' ').Select(x => float.Parse(x));
+                return new vec3(fs.ElementAt(0), fs.ElementAt(1), fs.ElementAt(2));
+            }
+            vec4 asVec4(string str) {
+                var fs = str.Split(' ').Select(x => float.Parse(x));
+                return new vec4(fs.ElementAt(0), fs.ElementAt(1), fs.ElementAt(2), fs.ElementAt(3));
+            }
+            Quaternion asQuat(string str) {
+                var fs = str.Split(' ').Select(x => float.Parse(x));
+                return new Quaternion(fs.ElementAt(0), fs.ElementAt(1), fs.ElementAt(2), fs.ElementAt(3));
+            }
+            Matrix4 asMat4(string str) {
+                var res = new Matrix4(9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9);
+                // TODO: make this work !
+                var fs = str.Split(' ', '\n', '\r').Where(x => !string.IsNullOrEmpty(x)).Select(x => float.Parse(x)).ToArray();
+                for (int i = 0; i < fs.Count(); i++) {
+                    res[((i - 1) / 4), (i % 4)] = fs.ElementAt(i);
+                }
+                return res;
+            }
 
-                        if (toVec2(jarg as JArray, out vec2 v2))
-                            args.Add(v2);
-                        else if (toVec3(jarg as JArray, out vec3 v3))
-                            args.Add(v3);
-                        else
-                            args.Add(jarg.ToObject());
+            // Transform
+            if (child(xml, "transform", out XmlElement xtrans)) {
+                if (child(xtrans, "matrix", out XmlElement xmat)) {
+                    transform.matrix = asMat4(xmat.InnerText);
+                } else {
+                    if (child(xtrans, "position", out XmlElement xpos)) {
+                        transform.position = asVec3(xpos.InnerText);
+                    }
 
-                    } else {
-                        args.Add(jarg.ToObject());
+                    if (child(xtrans, "scale", out XmlElement xscale)) {
+                        transform.scale = asVec3(xscale.InnerText);
+                    }
+
+                    if (child(xtrans, "rotation", out XmlElement xrot)) {
+                        transform.rotation = asQuat(xrot.InnerText);
+                    } else if (child(xtrans, "euler", out XmlElement xeuler)) {
+
+                    } else if (child(xtrans, "axis_angle", out XmlElement xaxisa)) {
+
                     }
                 }
             }
 
-            return (Type.GetType(jobj["type"] as JString), null);
-        }
-
-        private static bool toVec2(JArray a, out Nums.vec2 v) {
-            if (a.Count == 2) {
-                v = new Nums.vec2(a[0] as JNumber, a[1] as JNumber);
-                return true;
-            }
-            v = vec2.zero;
-            return false;
-        }
-        private static bool toVec3(JArray a, out vec3 v) {
-            if (a.Count == 3) {
-                v = new vec3(a[0] as JNumber, a[1] as JNumber, a[2] as JNumber);
-                return true;
-            }
-            v = vec3.zero;
-            return false;
-        }
-
-        private static object PreProcessingDirective(string str) {
-            if (str.StartsWith("mesh(")) {
-                str = str.Substring(5, str.Length - 6);
-                return Assets.GetMesh(str);
-            } else if (str.StartsWith("material(")) {
-                str = str.Substring(9, str.Length - 10);
-                return typeof(BlinnPhongMaterial).GetProperty(str).GetValue(null);
+            // components
+            if (child(xml, "components", out XmlElement xcomps)) {
+                foreach (var item in xcomps.ChildNodes) {
+                    var xcomp = item as XmlElement;
+                    //components.Add(Type.GetType(xcomp.Name), null);
+                    var fs = new Dictionary<string, object>();
+                    foreach (var item2 in xcomp.ChildNodes) {
+                        var xfield = item2 as XmlElement;
+                        fs.Add(xfield.Name, null); // TODO: parse value here
+                    }
+                    components.Add(new Comp(Type.GetType(xcomp.Name), fs));
+                    
+                }
             }
 
-            return null;
+            // children
+            var c = xml.SelectNodes("prefab");
+            foreach (var item in c) {
+                children.Add(new Prefab(item as XmlElement));
+            }
+
         }
 
-        public Prefab AddChild(Prefab child) {
-            children.Add(child);
-            return this;
+        public Prefab(GameObject gameobject) {
+            transform.set(gameobject.transform);
+
+            // components
+
+
+            // children
+            foreach (var item in gameobject.children) {
+                children.Add(new Prefab(item));
+            }
         }
 
-        public Prefab AddChildren(params Prefab[] _children) {
-            children.AddRange(_children);
-            return this;
+        public XmlElement asXml() {
+            throw new NotImplementedException();
         }
 
-        public Prefab AddComp(Type type, params object[] args) {
-            components.Add(type, args);
-            return this;
-        }
-
-        public Prefab AddComp<T>(params object[] args) where T : Component {
-            components.Add(typeof(T), args);
-            return this;
-        }
-
-        public GameObject NewInstance() {
+        public GameObject createInstance() {
             var g = new GameObject();
             g.transform.position = transform.position;
             g.transform.rotation = transform.rotation;
             g.transform.scale = transform.scale;
 
             foreach (var item in components) {
-                g.AddComp(item.Key.GetConstructor(item.Value.Select(x => x.GetType()).ToArray()).Invoke(item.Value) as Component);
+
+
+                //g.AddComp(item.Key.GetConstructor(item.Value?.Select(x => x.GetType())?.ToArray() ?? Array.Empty<Type>()).Invoke(item.Value) as Component);
+
+                g.AddComp(item.create());
+
             }
 
             foreach (var item in children) {
-                var c = item.NewInstance();
+                var c = item.createInstance();
                 g.AddChild(c);
             }
 

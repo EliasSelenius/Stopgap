@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Xml;
 using Nums;
 
 namespace Stopgap.Gui {
@@ -14,7 +14,11 @@ namespace Stopgap.Gui {
         top_right,
         bottom_left,
         bottom_right,
-        center
+        center,
+        top_center,
+        bottom_center,
+        left_center,
+        right_center
     }
 
     public class Element {
@@ -28,17 +32,20 @@ namespace Stopgap.Gui {
         public bool focused => canvas.focusedElement == this;
 
         public Anchor anchor = Anchor.center;
-        public unit2 size = new unit2(UnitType.viewHeight, .5f, .5f);
+        public unit2 size = new unit2(UnitType.viewHeight, .5f, .5f);// new unit2(UnitType.viewHeight, .5f, .5f);
         public unit2 pos = new unit2(UnitType.ndc, 0, 0);
-        public vec2 size_ndc => size.get_ndc(this);
+        public vec2 size_ndc => size.get_ndc(this) * (parent?.size_ndc ?? vec2.one);
         public vec2 pos_ndc => anchor switch {
-            Anchor.top_left => pos.get_ndc(this) + size_ndc * new vec2(.5f, -.5f),
-            Anchor.top_right => pos.get_ndc(this) + size_ndc * new vec2(-.5f, -.5f),
-            Anchor.bottom_left => pos.get_ndc(this) + size_ndc * .5f,
-            Anchor.bottom_right => pos.get_ndc(this) + size_ndc * new vec2(-.5f, .5f),
-            Anchor.center => pos.get_ndc(this)
+            Anchor.top_left => transformedByParent(pos.get_ndc(this)) + size_ndc * new vec2(.5f, -.5f),
+            Anchor.top_right => transformedByParent(pos.get_ndc(this)) + size_ndc * new vec2(-.5f, -.5f),
+            Anchor.bottom_left => transformedByParent(pos.get_ndc(this)) + size_ndc * .5f,
+            Anchor.bottom_right => transformedByParent(pos.get_ndc(this)) + size_ndc * new vec2(-.5f, .5f),
+            Anchor.center => transformedByParent(pos.get_ndc(this))
         };
             
+        private vec2 transformedByParent(vec2 v) {
+            return (parent?.pos_ndc ?? vec2.zero) + v * (parent?.size_ndc ?? vec2.one * 2f) * 0.5f;
+        }
 
 
         // ndc is normalized device coordinates
@@ -90,6 +97,10 @@ namespace Stopgap.Gui {
             elm.ConnectedToParent();
 
             return elm;
+        }
+
+        public virtual void loadXml(XmlElement xml) {
+
         }
 
         private void ApplyUniforms() {

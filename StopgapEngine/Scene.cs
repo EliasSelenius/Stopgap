@@ -9,6 +9,7 @@ using Nums;
 using SixLabors.ImageSharp.Processing;
 using System.Security.Cryptography;
 using System.Runtime.CompilerServices;
+using Glow;
 
 namespace Stopgap {
     public class Scene {
@@ -24,6 +25,7 @@ namespace Stopgap {
 
         internal readonly List<IRenderable> renderables = new List<IRenderable>();  
         internal virtual void render() {
+
             foreach (var renderable in renderables) {
                 renderable.render();
             }
@@ -41,7 +43,7 @@ namespace Stopgap {
         }
 
         
-        internal void Update() {
+        internal virtual void Update() {
             UpdateEvent?.Invoke();
         }
 
@@ -88,34 +90,5 @@ namespace Stopgap {
             return null;
         }
 
-    }
-
-    public class Editor : Scene {
-
-        public static readonly Editor instance;
-
-        static Editor() => instance = new Editor();
-        private Editor() {
-            user = spawn(new Camera(), new CamFlyController());
-        }
-
-        public Scene editing_scene;
-
-        private GameObject user;
-
-
-        public static void play() {
-            Game.SetScene(instance.editing_scene);
-        }
-        public static void open() {
-            if (Game.scene == instance) return;
-            instance.editing_scene = Game.scene;
-            Game.SetScene(instance);
-        }
-
-        internal override void render() {
-            editing_scene?.render();
-            base.render();
-        }
     }
 }

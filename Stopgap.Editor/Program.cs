@@ -13,15 +13,25 @@ using System.Xml;
 using System.Runtime.InteropServices;
 
 
-
 namespace StopgapEditor {
+    
     class Program {
+
+
 
         static void Main(string[] args) {
 
             Game.onLoad = () => {
 
                 Game.SetScene(new Scene());
+
+                
+
+
+                // test prefab xml loading
+                {
+                    //Assets.getPrefab("test-prefab").createInstance().EnterScene(Game.scene);
+                }
 
                 // test multi-material mesh 
                 {
@@ -63,22 +73,6 @@ namespace StopgapEditor {
                     var c = new Canvas(doc["assets"]["canvas"]);
                 }
 
-
-                // test collada import:
-                {
-                    var xml = new System.Xml.XmlDocument();
-                    xml.Load("data/models/Ships2.dae"); //untitled.dae");
-                    var collada = new Collada(xml);
-
-                    var gs = collada.to_gameobject();
-                    foreach (var item in gs) {
-                        item.transform.position *= 10;
-                        item.transform.scale *= 10;
-
-                        item.EnterScene(Game.scene);
-                    }
-
-                }
 
                 
                 var user = new GameObject();
@@ -135,10 +129,10 @@ namespace StopgapEditor {
                         albedo = vec3.one * .8f,
                         metallic = math.range(0, 1),
                         roughness = math.range(0, 1)
-                    }), new ParticleSystem(particle_material, 20, 10) {
+                    })/*, new ParticleSystem(particle_material, 20, 10) {
                         startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * math.rand((int)(Game.time * 1000f) + 3) * 3f,
                         startScale = () => vec2.one
-                    });
+                    }*/);
                     g.transform.position = new Nums.vec3(math.rand(i),
                                                          math.rand(i + 1),
                                                          math.rand(i + 2)) * 500;
@@ -211,6 +205,13 @@ namespace StopgapEditor {
 
                 InitGUI();
 
+                // test counter
+                {
+                    var g = new GameObject();
+                    g.AddComp(new TestCounter());
+                    g.EnterScene(Game.scene);
+                }
+
                 Editor.open();
             };
 
@@ -249,6 +250,10 @@ namespace StopgapEditor {
                         Editor.play();
                     } else if (text.Equals("edit")) {
                         Editor.open();
+                    } else if (text.StartsWith("spawn")) {
+                        var g = Assets.getPrefab(text.Substring(6)).createInstance();
+                        g.EnterScene(Editor.instance.editing_scene);
+                        g.transform.position = Game.scene.main_camera.transform.position;
                     }
                 }
             };

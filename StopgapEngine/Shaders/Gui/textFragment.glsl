@@ -11,7 +11,7 @@ void main() {
 	vec4 c = color;
 
     c *= texture(font_atlas, uv);
-    if (c.a < 0.5) discard;		
+    if (c.a < 0.1) discard;		
 
 	out_color = c;
 }
