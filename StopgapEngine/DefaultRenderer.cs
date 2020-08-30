@@ -60,11 +60,11 @@ namespace Stopgap {
             // bind these buffers to be rendererd on to
             image_effect_buffers.bind();
             renderScene(Game.scene); // render the scene to it
+            // gui
+            Game.canvas?.Render();
             image_effect_buffers.render(); // finaly render the buffers on to the screen
 
 
-            // gui
-            Game.canvas?.Render();
         }
 
     }

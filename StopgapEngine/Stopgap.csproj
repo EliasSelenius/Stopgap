@@ -113,6 +113,7 @@
     <Compile Include="Renderer.cs" />
     <Compile Include="Script\ScriptParser.cs" />
     <Compile Include="SphereCollider.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="Vao_vbo_ebo.cs" />
     <Content Include="draft.txt" />
     <Content Include="Markup\markupdraft.txt" />

@@ -8,6 +8,7 @@ using OpenTK;
 using Nums;
 using JsonParser;
 using System.Collections.Specialized;
+using System.Xml;
 
 namespace Stopgap {
     public class Transform {
@@ -33,6 +34,22 @@ namespace Stopgap {
             return res;
         }
 
+        public void setFromXml(XmlElement xml) {
+            XmlElement el;
+            if (xml.getChild("matrix", out el)) {
+                // TODO: implement
+            } else {
+                if (xml.getChild("position", out el)) position = el.asVec3();
+                if (xml.getChild("scale", out el)) scale = el.asVec3();
+                if (xml.getChild("rotation", out el)) rotation = el.asVec4().toOpenTKQuat();
+                else if (xml.getChild("euler", out el)) rotation = Quaternion.FromEulerAngles(el.asVec3().ToOpenTKVec());
+                else if (xml.getChild("axis_angle", out el)) {
+                    var v = el.asVec4();
+                    rotation = Quaternion.FromAxisAngle(v.xyz.ToOpenTKVec(), v.w);
+                } 
+            }
+        }
+
 
         public Matrix4 matrix {
             get => Matrix4.CreateScale(scale.ToOpenTKVec()) * Matrix4.CreateFromQuaternion(rotation) * Matrix4.CreateTranslation(position.ToOpenTKVec());
@@ -54,6 +71,7 @@ namespace Stopgap {
         public vec3 scale = vec3.one;
         public Quaternion rotation = Quaternion.Identity;
 
+        #region Constructors
 
         public Transform() { }
         public Transform(vec3 pos) => position = pos;
@@ -67,6 +85,7 @@ namespace Stopgap {
         public Transform(vec3 pos, vec3 scl, Quaternion rot) {
             position = pos; scale = scl; rotation = rot;
         }
+        #endregion
 
         public void set(Transform transform) {
             position = transform.position;

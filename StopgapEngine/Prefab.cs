@@ -43,75 +43,33 @@ namespace Stopgap {
 
         public Prefab() { }
 
-        public Prefab(XmlElement xml) {
-            bool child(XmlElement x, string c, out XmlElement n) => 
-                (n = x[c]) != null;
-            vec3 asVec3(string str) {
-                var fs = str.Split(' ').Select(x => float.Parse(x));
-                return new vec3(fs.ElementAt(0), fs.ElementAt(1), fs.ElementAt(2));
-            }
-            vec4 asVec4(string str) {
-                var fs = str.Split(' ').Select(x => float.Parse(x));
-                return new vec4(fs.ElementAt(0), fs.ElementAt(1), fs.ElementAt(2), fs.ElementAt(3));
-            }
-            Quaternion asQuat(string str) {
-                var fs = str.Split(' ').Select(x => float.Parse(x));
-                return new Quaternion(fs.ElementAt(0), fs.ElementAt(1), fs.ElementAt(2), fs.ElementAt(3));
-            }
-            Matrix4 asMat4(string str) {
-                var res = new Matrix4(9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9);
-                // TODO: make this work !
-                var fs = str.Split(' ', '\n', '\r').Where(x => !string.IsNullOrEmpty(x)).Select(x => float.Parse(x)).ToArray();
-                for (int i = 0; i < fs.Count(); i++) {
-                    res[((i - 1) / 4), (i % 4)] = fs.ElementAt(i);
-                }
-                return res;
-            }
 
-            // Transform
-            if (child(xml, "transform", out XmlElement xtrans)) {
-                if (child(xtrans, "matrix", out XmlElement xmat)) {
-                    transform.matrix = asMat4(xmat.InnerText);
-                } else {
-                    if (child(xtrans, "position", out XmlElement xpos)) {
-                        transform.position = asVec3(xpos.InnerText);
-                    }
+        public void setFromXml(XmlElement xml) {
 
-                    if (child(xtrans, "scale", out XmlElement xscale)) {
-                        transform.scale = asVec3(xscale.InnerText);
-                    }
-
-                    if (child(xtrans, "rotation", out XmlElement xrot)) {
-                        transform.rotation = asQuat(xrot.InnerText);
-                    } else if (child(xtrans, "euler", out XmlElement xeuler)) {
-
-                    } else if (child(xtrans, "axis_angle", out XmlElement xaxisa)) {
-
-                    }
-                }
-            }
+            transform.setFromXml(xml);
 
             // components
-            if (child(xml, "components", out XmlElement xcomps)) {
+            if (xml.getChild("components", out XmlElement xcomps)) {
+                // foreach component
                 foreach (var item in xcomps.ChildNodes) {
                     var xcomp = item as XmlElement;
-                    //components.Add(Type.GetType(xcomp.Name), null);
                     var fs = new Dictionary<string, object>();
-                    foreach (var item2 in xcomp.ChildNodes) {
+                    foreach (var item2 in xcomp.SelectNodes("prop")) {
                         var xfield = item2 as XmlElement;
-                        fs.Add(xfield.Name, null); // TODO: parse value here
+                        fs.Add(xfield.GetAttribute("name"), Utils.getValueFromXml(xfield));
                     }
                     components.Add(new Comp(Type.GetType(xcomp.Name), fs));
-                    
+
                 }
             }
 
             // children
-            var c = xml.SelectNodes("prefab");
+            var c = xml.SelectNodes("child");
             foreach (var item in c) {
-                children.Add(new Prefab(item as XmlElement));
+                var p = new Prefab();
+                p.setFromXml((XmlElement)item);
+                children.Add(p);
             }
-
         }
 
         public Prefab(GameObject gameobject) {

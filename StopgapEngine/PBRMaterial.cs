@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Nums;
 using Glow;
+using System.Xml;
+using System.CodeDom;
 
 namespace Stopgap {
 
@@ -14,10 +16,21 @@ namespace Stopgap {
 
         Dictionary<string, propvalue> props = new Dictionary<string, propvalue>();
 
+        public Material() { }
         public Material(ShaderProgram shader) {
             this.shader = shader;
         }
 
+        public void setFromXml(XmlElement xml) {
+            shader = Assets.getShader(xml["shader"].InnerText);
+
+            foreach (var item in xml.SelectNodes("prop")) {
+                var x = item as XmlElement;
+                setProperty(x.GetAttribute("name"), Utils.getValueFromXml(x));
+            }
+        }
+
+        #region classes
         interface propvalue {
             void set(string name, ShaderProgram s);
         }
@@ -36,6 +49,15 @@ namespace Stopgap {
         class vec4_prop : propvalue {
             public vec4 value;
             public void set(string name, ShaderProgram s) => s.set_vec4(name, value);
+        }
+        #endregion
+
+        public void setProperty(string name, object value) {
+            if (value is float) set_float(name, (float)value);
+            else if (value is vec2) set_vec2(name, (vec2)value);
+            else if (value is vec3) set_vec3(name, (vec3)value);
+            else if (value is vec4) set_vec4(name, (vec4)value);
+            else throw new Exception(value.GetType().Name + " is not a valid material property");
         }
 
         public void set_float(string name, float value) => props[name] = new float_prop { value = value };

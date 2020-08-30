@@ -23,6 +23,7 @@ namespace Stopgap {
             if (is_open) return;
             instance.editing_scene = Game.scene;
             Game.SetScene(instance);
+            //instance.user.transform.set(instance.editing_scene.main_camera.transform);
         }
 
         internal override void render() {

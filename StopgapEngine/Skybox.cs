@@ -93,7 +93,7 @@ namespace Stopgap {
         private static ShaderProgram cubemapShader;
         static CubemapSkybox() {
             cubemapShader = ShaderProgram.create(Shaders.ShaderResources.skyboxFragment, Shaders.ShaderResources.skyboxVertex);
-            Assets.Shaders["cubemap_skybox"] = cubemapShader;
+            Assets.setShader("cubemap_skybox", cubemapShader);
         }
 
         private readonly int cubeMapId;

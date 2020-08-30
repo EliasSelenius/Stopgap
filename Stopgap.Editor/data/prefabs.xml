@@ -1,35 +1,50 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <assets>
   <prefab name="test-prefab">
-    <transform>
-      <position>0 0 -60</position>
-      <scale>5 6 7</scale>
-      <rotation>0 0 0 1</rotation>
-    </transform>
+    <position>0 0 -60</position>
+    <scale>5 6 7</scale>
+    <rotation>0 0 0 1</rotation>
     <components>
       <Stopgap.Rigidbody>
-        <Mass>1.0</Mass>
+        <prop name="Mass" type="float">1.0</prop>
+        <prop name="Velocity" type="vec3">1 10 1</prop>
       </Stopgap.Rigidbody>
       <Stopgap.MeshRenderer>
-        <mesh>cube-mesh</mesh>
+        <prop name="mesh" type="Mesh">sphere</prop>
+        <prop name="material" type="Material">testMat</prop>
       </Stopgap.MeshRenderer>
     </components>
-    <prefab>
-      <transform>
-        <position>1 1 1</position>
-        <scale>0.5 0.5 0.5</scale>
-      </transform>
+    <child>
+      <position>3 0 -4</position>
       <components>
         <Stopgap.MeshRenderer>
-          <mesh></mesh>
+          <prop name="mesh" type="Mesh">cube</prop>
+          <prop name="material" type="Material">testMat2</prop>
         </Stopgap.MeshRenderer>
       </components>
-    </prefab>
+    </child>
   </prefab>
-
-  <ShaderProgram name="hello">
-    <vertex_path></vertex_path>
-  </ShaderProgram>
   
+  
+  <ShaderProgram name="hello">
+    <vert>defaultVertex</vert>
+    <frag>defaultFragment</frag>
+  </ShaderProgram>
 
+  <material name="testMat">
+    <shader>default</shader>
+    <prop name="albedo" type="vec3">1 0 1</prop>
+    <prop name="metallic" type="float">0.6</prop>
+    <prop name="roughness" type="float">0.5</prop>
+    <prop name="emission" type="vec3">0 0 0</prop>
+  </material>
+
+  <material name="testMat2">
+    <shader>default</shader>
+    <prop name="albedo" type="vec3">0 1 0</prop>
+    <prop name="metallic" type="float">0</prop>
+    <prop name="roughness" type="float">0</prop>
+    <prop name="emission" type="vec3">1 0 0</prop>
+  </material>
+  
 </assets>

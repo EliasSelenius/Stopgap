@@ -4,7 +4,9 @@ uniform sampler2D font_atlas;
 
 uniform vec4 color;
 
-out vec4 out_color;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
+
 in vec2 uv;
 
 void main() {
@@ -13,5 +15,6 @@ void main() {
     c *= texture(font_atlas, uv);
     if (c.a < 0.1) discard;		
 
-	out_color = c;
+	FragColor = c;
+	BrightColor = vec4(0.0);
 }

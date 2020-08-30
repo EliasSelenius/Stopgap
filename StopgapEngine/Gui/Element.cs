@@ -31,36 +31,8 @@ namespace Stopgap.Gui {
         public bool has_parent => parent != null;
         public bool focused => canvas.focusedElement == this;
 
+        public readonly Transform transform = new Transform();
         public Anchor anchor = Anchor.center;
-        public unit2 size = new unit2(UnitType.viewHeight, .5f, .5f);// new unit2(UnitType.viewHeight, .5f, .5f);
-        public unit2 pos = new unit2(UnitType.ndc, 0, 0);
-        public vec2 size_ndc => size.get_ndc(this) * (parent?.size_ndc ?? vec2.one);
-        public vec2 pos_ndc => anchor switch {
-            Anchor.top_left => transformedByParent(pos.get_ndc(this)) + size_ndc * new vec2(.5f, -.5f),
-            Anchor.top_right => transformedByParent(pos.get_ndc(this)) + size_ndc * new vec2(-.5f, -.5f),
-            Anchor.bottom_left => transformedByParent(pos.get_ndc(this)) + size_ndc * .5f,
-            Anchor.bottom_right => transformedByParent(pos.get_ndc(this)) + size_ndc * new vec2(-.5f, .5f),
-            Anchor.center => transformedByParent(pos.get_ndc(this))
-        };
-            
-        private vec2 transformedByParent(vec2 v) {
-            return (parent?.pos_ndc ?? vec2.zero) + v * (parent?.size_ndc ?? vec2.one * 2f) * 0.5f;
-        }
-
-
-        // ndc is normalized device coordinates
-        /*
-        public vec2 size_ndc {
-            get => new vec2(size.x * canvas.aspectRatio, size.y);
-            set => size = new vec2(value.x / canvas.aspectRatio, value.y);
-        }
-        public vec2 pos_ndc {
-            get => new vec2(pos.x * canvas.aspectRatio, pos.y);
-            set => pos = new vec2(value.x / canvas.aspectRatio, value.y);
-        }*/
-
-        //public float aspect => size.y / size.x;
-
         public bool draw_background = true;
         public vec4 background_color = (.7f, .7f, .7f, 1);
         public bool visible = true;
@@ -110,8 +82,8 @@ namespace Stopgap.Gui {
                 p += Parent.pos;
             }*/
 
-            vec2 p = pos_ndc, s = size_ndc;
-            Canvas.rectShader.set_vec4("rectTransform", p.x, p.y, s.x, s.y);
+            //Canvas.rectShader.set_vec4("rectTransform", transform.position.x, transform.position.y, transform.scale.x, transform.scale.y);
+            Canvas.rectShader.set_mat4("model", transform.matrix);
             Canvas.rectShader.set_vec4("color", background_color);
         }
 
@@ -153,8 +125,8 @@ namespace Stopgap.Gui {
             if (!active) return;
 
             var mp = Input.MousePos_ndc;
-            var hs = size_ndc * .5f;
-            if (MyMath.InsideBounds(mp, pos_ndc - hs, pos_ndc + hs)) {
+            var hs = transform.scale.xy * .5f;
+            if (MyMath.InsideBounds(mp, transform.position.xy - hs, transform.position.xy + hs)) {
                 this.OnHover?.Invoke(this);
                 if (Input.LeftMousePressed) {
                     this.OnClick?.Invoke(this);

@@ -122,7 +122,7 @@ namespace Stopgap.Gui {
             vertices.Clear();
             indices.Clear();
 
-            var hs = size_ndc * .5f;
+            var hs = transform.scale.xy * .5f;
             cursor = new vec2(-hs.x, hs.y);
 
             uint quadsCount = 0;
@@ -218,7 +218,8 @@ namespace Stopgap.Gui {
 
             Canvas.textShader.use();
 
-            Canvas.textShader.set_vec2("textPosition", pos_ndc);
+            //Canvas.textShader.set_vec2("textPosition", transform.position.xy);
+            Canvas.textShader.set_mat4("model", transform.matrix);
             Canvas.textShader.set_vec4("color", text_color);
             font.Atlas.bind(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
             vao.draw_elements(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, indices.Count, OpenTK.Graphics.OpenGL4.DrawElementsType.UnsignedInt);

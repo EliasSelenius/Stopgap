@@ -84,9 +84,9 @@ namespace Stopgap {
             
             // FPS display:
             var fpsd = c.Create<Gui.Textbox>();
-            fpsd.font_size = 0.14f;
-            fpsd.size = Gui.unit2.parse("0.2vw 0.03vh");
-            fpsd.pos = Gui.unit2.parse("-0.5vw 0.5vh");
+            //fpsd.font_size = 0.14f;
+            //fpsd.size = Gui.unit2.parse("0.2vw 0.03vh");
+            //fpsd.pos = Gui.unit2.parse("-0.5vw 0.5vh");
             fpsd.anchor = Gui.Anchor.top_left;
             fpsd.draw_background = false;
             fpsd.OnUpdate += e => {

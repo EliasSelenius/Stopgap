@@ -19,6 +19,11 @@ namespace Stopgap {
 
         protected override void Update() {
 
+            if (Input.IsKeyPressed(OpenTK.Input.Key.T)) {
+                var o = Assets.getPrefab("test-prefab").createInstance();
+                o.EnterScene(scene);
+            }
+
 
             if (Input.MouseRightButtonDown) {
                 Input.FixedMouse(true);

@@ -46,8 +46,8 @@ namespace Stopgap {
         }
 
         public ShaderProgram default_shader {
-            get => Assets.Shaders["default"];
-            set => Assets.Shaders["default"] = value;
+            get => Assets.getShader("default");
+            set => Assets.setShader("default", value);
         }
 
 

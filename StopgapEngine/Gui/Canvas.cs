@@ -16,6 +16,9 @@ namespace Stopgap.Gui {
         static Canvas() {
             rectShader = ShaderProgram.create(Shaders.ShaderResources.rectElementFragment, Shaders.ShaderResources.rectElementVertex);
             textShader = ShaderProgram.create(Shaders.ShaderResources.textFragment, Shaders.ShaderResources.textVertex);
+
+            rectShader.uniformblock_binding("Camera", 0);
+            textShader.uniformblock_binding("Camera", 0);
         }
 
 
