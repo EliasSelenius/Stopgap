@@ -1,5 +1,6 @@
 ﻿using Nums;
 using OpenTK;
+using OpenTK.Graphics.ES20;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace Stopgap {
         public static Quaternion toOpenTKQuat(this vec4 v) => new Quaternion(v.x, v.y, v.z, v.w);
 
         private static Dictionary<string, Func<string, object>> xmlValueGetters = new Dictionary<string, Func<string, object>>() {
+            { "string", s => s },
             { "float", s => float.Parse(s) },
             { "vec3", s => parseVec3(s) },
             { "vec4", s => parseVec4(s) },
@@ -39,5 +41,31 @@ namespace Stopgap {
             var type = xml.GetAttribute("type");
             return xmlValueGetters[type](xml.InnerText);
         }
+
+        #region matrix manipulation
+        private static List<mat4> matrices = new List<mat4>();
+        public static mat4 matrix { 
+            get => matrices[matrices.Count - 1];
+            set => matrices[matrices.Count - 1] = value;
+        } 
+        public static void pushMatrix() {
+            if (matrices.Count == 0) matrices.Add(mat4.identity);
+            else matrices.Add(matrix);   
+        }
+        public static mat4 popMatrix() {
+            var m = matrix;
+            matrices.RemoveAt(matrices.Count - 1);
+            return m;
+        }
+
+        public static void translate(vec3 translation) {
+            var m = matrix;
+            m.m14 += translation.x;
+            m.m24 += translation.y;
+            m.m34 += translation.z;
+            matrix = m;
+        }
+
+        #endregion
     }
 }

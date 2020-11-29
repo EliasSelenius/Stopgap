@@ -16,7 +16,7 @@ namespace Stopgap {
             gameObject = obj;
         }
 
-        internal void Destroy() {
+        internal void destroy() {
             OnDestroy();
             gameObject = null;
         }

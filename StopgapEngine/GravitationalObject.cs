@@ -14,7 +14,7 @@ namespace Stopgap {
         private Rigidbody rb;
 
         public override void Start() {
-            rb = gameObject.GetComponent<Rigidbody>();
+            rb = gameObject.getComponent<Rigidbody>();
         }
 
         protected override void OnEnter() {

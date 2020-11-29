@@ -31,7 +31,7 @@ namespace Stopgap {
         private static readonly Dictionary<string, Material> materials = new Dictionary<string, Material>();
         private static readonly Dictionary<string, ShaderProgram> shaders = new Dictionary<string, ShaderProgram>();
         private static readonly Dictionary<string, string> shaderSourceFiles = new Dictionary<string, string>();
-        private static readonly Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
+        private static readonly Dictionary<string, XmlElement> scenes = new Dictionary<string, XmlElement>();
         private static readonly Dictionary<string, SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>> Images = new Dictionary<string, SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>>();
 
 
@@ -53,7 +53,11 @@ namespace Stopgap {
         public static ShaderProgram getShader(string name) => shaders[name];
         public static void setShader(string name, ShaderProgram s) => shaders[name] = s;
         public static Material getMaterial(string name) => materials[name];
-        public static Scene getScene(string name) => scenes[name];
+        public static Scene loadScene(string name) {
+            var r = new Scene();
+            r.loadFromXML(scenes[name]);
+            return r;
+        } 
 
         internal static void Load() {
 
@@ -173,6 +177,9 @@ namespace Stopgap {
                         }
 
                         // scenes...
+                        else if (xml.Name.Equals("scene")) {
+                            scenes.Add(xml.GetAttribute("name"), xml);
+                        }
 
                     }
                 }

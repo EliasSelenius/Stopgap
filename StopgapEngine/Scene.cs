@@ -10,6 +10,8 @@ using SixLabors.ImageSharp.Processing;
 using System.Security.Cryptography;
 using System.Runtime.CompilerServices;
 using Glow;
+using System.Xml;
+using OpenTK.Graphics.ES10;
 
 namespace Stopgap {
     public class Scene {
@@ -34,6 +36,34 @@ namespace Stopgap {
             skybox?.render();
         }
 
+        internal void cleanup() {
+
+        }
+
+        internal void loadFromXML(XmlElement xml) {
+            GameObject loadGO(XmlElement x) {
+                GameObject go;
+                if (x.HasAttribute("prefab")) {
+                    go = Assets.getPrefab(x.GetAttribute("prefab")).createInstance();
+                } else go = new GameObject();
+
+                go.transform.setFromXml(x);
+
+                // components
+
+                // children
+                foreach (var item in x.SelectNodes("child")) {
+                    go.addChild(loadGO(item as XmlElement));
+                }
+
+                return go;
+            }
+
+            foreach (var item in xml.SelectNodes("gameobject")) {
+                loadGO(item as XmlElement).enterScene(this);
+            }
+
+        }
 
         internal void _remove_object(GameObject o) {
             _gameObjects.Remove(o);
@@ -51,7 +81,7 @@ namespace Stopgap {
 
         public GameObject spawn(params Component[] comps) {
             var g = new GameObject(comps);
-            g.EnterScene(this);
+            g.enterScene(this);
             return g;
         }
 

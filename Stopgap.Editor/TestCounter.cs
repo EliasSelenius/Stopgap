@@ -18,7 +18,7 @@ public class TestCounter : Component {
         text.font_size = 0.5f;
 
 
-        gameObject.AddComps(new MeshRenderer(Assets.getMesh("sphere"), PBRMaterial.Default), new SphereCollider());
+        gameObject.addComponents(new MeshRenderer(Assets.getMesh("sphere"), PBRMaterial.Default), new SphereCollider());
     }
 
     protected override void Update() {

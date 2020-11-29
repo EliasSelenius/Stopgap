@@ -99,13 +99,13 @@ namespace Stopgap {
 
                 //g.AddComp(item.Key.GetConstructor(item.Value?.Select(x => x.GetType())?.ToArray() ?? Array.Empty<Type>()).Invoke(item.Value) as Component);
 
-                g.AddComp(item.create());
+                g.addComponent(item.create());
 
             }
 
             foreach (var item in children) {
                 var c = item.createInstance();
-                g.AddChild(c);
+                g.addChild(c);
             }
 
             g.Start();

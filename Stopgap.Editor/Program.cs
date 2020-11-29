@@ -76,26 +76,26 @@ namespace StopgapEditor {
 
                 
                 var user = new GameObject();
-                user.AddComps(
+                user.addComponents(
                     new Camera(),
                     new CamFlyController());
-                user.EnterScene(Game.scene);
+                user.enterScene(Game.scene);
                 
                 var testObj = new GameObject();
-                testObj.AddComps(
+                testObj.addComponents(
                     new MeshRenderer(Assets.getMesh("SpaceShip"), PBRMaterial.Default));
 
-                var m = testObj.GetComponent<MeshRenderer>().mesh;
+                var m = testObj.getComponent<MeshRenderer>().mesh;
                 m.Mutate(v => {
                     v.pos += new Nums.vec3(math.rand(), math.rand(), math.rand());
                     return v;
                 });
                 m.Apply();
                 testObj.transform.position = (-100, 0, 0);
-                testObj.EnterScene(Game.scene);
+                testObj.enterScene(Game.scene);
 
                 var quadObj = new GameObject();
-                quadObj.AddComp(new MeshRenderer(Mesh.GenQuad(), PBRMaterial.Default));
+                quadObj.addComponent(new MeshRenderer(Mesh.GenQuad(), PBRMaterial.Default));
                 //quadObj.EnterScene(Game.scene);
                 quadObj.transform.scale = (1000, 1000, 1000);
                 quadObj.transform.Rotate((-(float)Math.PI / 2f, 0f, 0f));
@@ -103,8 +103,8 @@ namespace StopgapEditor {
                 var galleon = new GameObject();
                 galleon.transform.position = (80, 0, 0);
                 galleon.transform.scale = (2, 2, 2);
-                galleon.AddComp(new MeshRenderer(Assets.getMesh("GalleonBoat"), PBRMaterial.Default));
-                galleon.EnterScene(Game.scene);
+                galleon.addComponent(new MeshRenderer(Assets.getMesh("GalleonBoat"), PBRMaterial.Default));
+                galleon.enterScene(Game.scene);
 
 
                 // init lots of objects
@@ -125,7 +125,7 @@ namespace StopgapEditor {
                 };
                 for (int i = 0; i < 200; i += 3) {
                     var g = new GameObject();
-                    g.AddComps(new MeshRenderer(icosphere, new PBRMaterial {
+                    g.addComponents(new MeshRenderer(icosphere, new PBRMaterial {
                         albedo = vec3.one * .8f,
                         metallic = math.range(0, 1),
                         roughness = math.range(0, 1)
@@ -136,9 +136,9 @@ namespace StopgapEditor {
                     g.transform.position = new Nums.vec3(math.rand(i),
                                                          math.rand(i + 1),
                                                          math.rand(i + 2)) * 500;
-                    g.AddComps(new Rigidbody { Mass = 10f, Velocity = (30, 0, 0) }, new GravitationalObject(), new SphereCollider());
+                    g.addComponents(new Rigidbody { Mass = 10f, Velocity = (30, 0, 0) }, new GravitationalObject(), new SphereCollider());
                     g.transform.scale *= math.rand(i)*7 + 20;
-                    g.EnterScene(Game.scene);
+                    g.enterScene(Game.scene);
                 }
 
 
@@ -153,7 +153,7 @@ namespace StopgapEditor {
                             }));
                             g.transform.position += (x, y, 0f);
                             g.transform.position *= 2f;
-                            g.EnterScene(Game.scene);
+                            g.enterScene(Game.scene);
                         }
                     }
                 }
@@ -162,7 +162,7 @@ namespace StopgapEditor {
                 var rigidbody = new GameObject();
                 var r = new Rigidbody();
                 
-                rigidbody.AddComps(r, new MeshRenderer(Assets.getMesh("GalleonBoat"), PBRMaterial.Default));
+                rigidbody.addComponents(r, new MeshRenderer(Assets.getMesh("GalleonBoat"), PBRMaterial.Default));
                 //rigidbody.EnterScene(Game.scene);
                 rigidbody.transform.position.y = 20;
 
@@ -179,25 +179,25 @@ namespace StopgapEditor {
                     return v;
                 });
                 pmesh.GenNormals();
-                planet.AddComps(new MeshRenderer(pmesh, PBRMaterial.Default), new Rigidbody { Mass = 10000f }, new GravitationalObject());
-                planet.EnterScene(Game.scene);
+                planet.addComponents(new MeshRenderer(pmesh, PBRMaterial.Default), new Rigidbody { Mass = 10000f }, new GravitationalObject());
+                planet.enterScene(Game.scene);
                 planet.transform.position = (0, 0, 700);
                 planet.transform.scale *= 100;
                 pmesh.Apply();
 
 
                 var billboard = new GameObject();
-                billboard.AddComps(new Billboard(PBRMaterial.Default), new Test());
+                billboard.addComponents(new Billboard(PBRMaterial.Default), new Test());
                 //billboard.EnterScene(Game.scene);
                 billboard.transform.position = (0, 40, 0);
                 billboard.transform.scale *= 3;
 
                 var ps = new GameObject();
-                ps.AddComp(new ParticleSystem(PBRMaterial.Default, 40, 20) { 
+                ps.addComponent(new ParticleSystem(PBRMaterial.Default, 40, 20) { 
                     startVelocity = () => MyMath.RandomDirection((int)(Game.time * 1000f)) * math.rand((int)(Game.time * 1000f) + 3) * 3f,
                 });
                 ps.transform.position = (-40, 20, 0);
-                ps.EnterScene(Game.scene);
+                ps.enterScene(Game.scene);
 
                 //Game.renderer.renderNormals = false;
                 // init editor Gui
@@ -208,7 +208,7 @@ namespace StopgapEditor {
                 // test counter
                 {
                     var g = new GameObject();
-                    g.AddComp(new TestCounter());
+                    g.addComponent(new TestCounter());
                     //g.EnterScene(Game.scene);
                 }
 
@@ -252,7 +252,7 @@ namespace StopgapEditor {
                         Editor.open();
                     } else if (text.StartsWith("spawn")) {
                         var g = Assets.getPrefab(text.Substring(6)).createInstance();
-                        g.EnterScene(Editor.instance.editing_scene);
+                        g.enterScene(Editor.instance.editing_scene);
                         g.transform.position = Game.scene.main_camera.transform.position;
                     }
                 }

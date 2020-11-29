@@ -39,35 +39,35 @@ namespace Stopgap {
 
 
         public GameObject(params Component[] comps) {
-            AddComps(comps);
+            addComponents(comps);
         }
 
-        public T GetComponent<T>() where T : Component {
+        public T getComponent<T>() where T : Component {
             return (from c in _components
                     where c is T
                     select c).FirstOrDefault() as T;
         }
 
-        public Component GetComponent(Type type) {
+        public Component getComponent(Type type) {
             return (from c in _components
                     where type.IsInstanceOfType(c)
                     select c).FirstOrDefault();
         }
 
-        public void AddChild(GameObject obj) {
+        public void addChild(GameObject obj) {
             // make sure the child object is in the same scene as the parent
-            if (obj.scene != scene) obj.EnterScene(scene);
+            if (obj.scene != scene) obj.enterScene(scene);
             
             _children.Add(obj);
             obj.parent = this;
         }
 
-        public void RemoveChild(GameObject obj) {
+        public void removeChild(GameObject obj) {
             _children.Remove(obj);
             obj.parent = null;
         }
 
-        public void AddComp(Component c) {
+        public void addComponent(Component c) {
             if (c.gameObject != null) throw new Exception("Component is already attached to a object");
 
             // keep track of 'offten used' components
@@ -82,9 +82,9 @@ namespace Stopgap {
             }
         }
 
-        public void AddComps(params Component[] comps) {
+        public void addComponents(params Component[] comps) {
             foreach (var item in comps) {
-                AddComp(item);
+                addComponent(item);
             }
         }
 
@@ -95,16 +95,16 @@ namespace Stopgap {
         }
 
 
-        public void EnterScene(Scene s) {
+        public void enterScene(Scene s) {
             // if we already are inside the scene
             if (scene == s) return;
 
             // make sure gameobject has 'started'
             if (!has_started) this.Start();
             // allow chilldren to enter first
-            for (int i = 0; i < _children.Count; i++) _children[i].EnterScene(s);
+            for (int i = 0; i < _children.Count; i++) _children[i].enterScene(s);
             // leave current scene before entering the new one
-            if (scene != null) LeaveScene();
+            if (scene != null) leaveScene();
             // enter scene
             scene = s;
             scene._add_object(this);
@@ -113,9 +113,9 @@ namespace Stopgap {
             
         }
 
-        public void LeaveScene() {
+        public void leaveScene() {
             if (scene == null) return;
-            for (int i = 0; i < children.Count; i++) _children[i].LeaveScene();
+            for (int i = 0; i < children.Count; i++) _children[i].leaveScene();
             for (int i = 0; i < _components.Count; i++) _components[i].Leave();
             scene._remove_object(this);
             scene = null;
@@ -125,11 +125,11 @@ namespace Stopgap {
             for (int i = 0; i < _components.Count; i++) _components[i].OnCollision(other);
         }
 
-        public void Destroy() {
-            parent?.RemoveChild(this);
-            for (int i = 0; i < _children.Count; i++) _children[i].Destroy();
-            for (int i = 0; i < _components.Count; i++) _components[i].Destroy();
-            if (scene != null) LeaveScene();
+        public void destroy() {
+            parent?.removeChild(this);
+            for (int i = 0; i < _children.Count; i++) _children[i].destroy();
+            for (int i = 0; i < _components.Count; i++) _components[i].destroy();
+            if (scene != null) leaveScene();
             
             _children.Clear();
             _components.Clear();

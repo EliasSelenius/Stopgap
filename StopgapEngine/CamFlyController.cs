@@ -20,8 +20,12 @@ namespace Stopgap {
         protected override void Update() {
 
             if (Input.IsKeyPressed(OpenTK.Input.Key.T)) {
-                var o = Assets.getPrefab("test-prefab").createInstance();
-                o.EnterScene(scene);
+                //var o = Assets.getPrefab("test-prefab").createInstance();
+                //o.enterScene(scene);
+
+                Game.SetScene(Assets.loadScene("main"));
+                Editor.open();
+
             }
 
 
@@ -31,8 +35,9 @@ namespace Stopgap {
                 var zrotinput = -Input.KeyAxis(OpenTK.Input.Key.Q, OpenTK.Input.Key.E) / 10f;
                 //transform.Rotate(vec3.unity, -Input.MouseDelta.x / 100f);
                 //transform.Rotate(transform.right, Input.MouseDelta.y / 100f);
-                x_angle = math.clamp(x_angle + Input.MouseDelta.y / 100f, -math.half_pi, math.half_pi);
-                y_angle += -Input.MouseDelta.x / 100f;
+                var md = Input.MouseDelta / 100f; // * Game.deltaTime;
+                x_angle = math.clamp(x_angle + md.y, -math.half_pi, math.half_pi);
+                y_angle += -md.x;
                 transform.setRotation(vec3.unity, y_angle);
                 transform.Rotate(transform.right, x_angle);
 

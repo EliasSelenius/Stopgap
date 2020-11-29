@@ -14,7 +14,7 @@ namespace Stopgap {
     public class Material {
         public ShaderProgram shader { get; private set; }
 
-        Dictionary<string, propvalue> props = new Dictionary<string, propvalue>();
+        readonly Dictionary<string, propvalue> props = new Dictionary<string, propvalue>();
 
         public Material() { }
         public Material(ShaderProgram shader) {
